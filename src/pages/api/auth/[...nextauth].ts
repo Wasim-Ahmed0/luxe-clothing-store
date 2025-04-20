@@ -1,8 +1,11 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import type { Account } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import type { Session } from "next-auth";
+import { prisma } from "../../../../lib/prisma";
+import argon2 from "argon2";
 
 export default NextAuth ({
     providers: [
@@ -18,13 +21,30 @@ export default NextAuth ({
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (
-                    credentials?.email == "test@example.com" &&
-                    credentials?.password == "password"
-                ) {
-                    return {id: "1", email: credentials.email, name: "Test User"};
+                if (!credentials?.email || !credentials.password) {
+                    throw new Error("Missing email or password");
                 }
-                return null;
+                
+                const user = await prisma.user.findUnique({
+                    where: { email: credentials.email },
+                });
+                
+                // No user found
+                if (!user || !user.password_hash) {
+                    throw new Error("Invalid details");
+                }
+                
+                // incorrect password
+                const valid = await argon2.verify(user.password_hash, credentials.password);
+                if (!valid) {
+                    throw new Error("Invalid details");
+                }
+                
+                return {
+                    id: user.user_id.toString(),
+                    name: user.username,
+                    email: user.email,
+                };
             },
         }),
     ],
@@ -46,6 +66,27 @@ export default NextAuth ({
             }
             return session;
         }
+    },
+
+    events: {
+        async signIn({ user, account }) {
+            if (account?.provider === "google") {
+                const password_hash = await argon2.hash(crypto.randomUUID());
+                await prisma.user.upsert({
+                    where: { email: user.email! },
+                    create: {
+                        username: user.name ?? user.email!.split("@")[0],
+                        email: user.email!,
+                        password_hash,
+                        role: "customer",
+                    },
+                    update: {
+                        // you could update their name here
+                        username: user.name ?? user.email!.split("@")[0],
+                    },
+                });
+            }
+        },
     }
 });
 
