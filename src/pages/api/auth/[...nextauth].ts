@@ -1,13 +1,13 @@
 import NextAuth from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import type { Account } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import type { Session } from "next-auth";
 import { prisma } from "../../../../lib/prisma";
 import argon2 from "argon2";
 
-export default NextAuth ({
+export const authOptions: NextAuthOptions = {
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID || "",
@@ -44,6 +44,7 @@ export default NextAuth ({
                     id: user.user_id.toString(),
                     name: user.username,
                     email: user.email,
+                    role: user.role,
                 };
             },
         }),
@@ -57,12 +58,16 @@ export default NextAuth ({
 
     callbacks: {
         async jwt({ token, user }) {
-            if (user) token.id = user.id;
+            if (user) {
+                token.id = user.id;
+                token.role = (user as any).role;
+            } 
             return token;
         },
         async session({ session, token }: {session: Session; token: JWT}) {
             if (token && session.user) {
                 session.user.id = token.id as string;
+                session.user.role = token.role as string;
             }
             return session;
         }
@@ -88,5 +93,7 @@ export default NextAuth ({
             }
         },
     }
-});
+};
+
+export default NextAuth(authOptions);
 
