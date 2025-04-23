@@ -89,12 +89,12 @@ model Inventory {
 
 model VirtualCart {
   cart_id    String   @id @default(uuid())
-  user_id    String
+  user_id    String? // optional user - allows creation of cart for guest
   store_id   String
   created_at DateTime @default(now())
   expires_at DateTime
 
-  user  User       @relation(fields: [user_id], references: [user_id])
+  user  User?      @relation(fields: [user_id], references: [user_id])
   store Store      @relation(fields: [store_id], references: [store_id])
   items CartItem[]
 }

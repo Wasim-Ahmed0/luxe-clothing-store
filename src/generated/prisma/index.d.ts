@@ -8608,7 +8608,7 @@ export namespace Prisma {
 
   export type VirtualCartGroupByOutputType = {
     cart_id: string
-    user_id: string
+    user_id: string | null
     store_id: string
     created_at: Date
     expires_at: Date
@@ -8637,7 +8637,7 @@ export namespace Prisma {
     store_id?: boolean
     created_at?: boolean
     expires_at?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | VirtualCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
     items?: boolean | VirtualCart$itemsArgs<ExtArgs>
     _count?: boolean | VirtualCartCountOutputTypeDefaultArgs<ExtArgs>
@@ -8649,7 +8649,7 @@ export namespace Prisma {
     store_id?: boolean
     created_at?: boolean
     expires_at?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | VirtualCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["virtualCart"]>
 
@@ -8659,7 +8659,7 @@ export namespace Prisma {
     store_id?: boolean
     created_at?: boolean
     expires_at?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | VirtualCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["virtualCart"]>
 
@@ -8673,30 +8673,30 @@ export namespace Prisma {
 
   export type VirtualCartOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"cart_id" | "user_id" | "store_id" | "created_at" | "expires_at", ExtArgs["result"]["virtualCart"]>
   export type VirtualCartInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | VirtualCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
     items?: boolean | VirtualCart$itemsArgs<ExtArgs>
     _count?: boolean | VirtualCartCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type VirtualCartIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | VirtualCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
   }
   export type VirtualCartIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | VirtualCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
   }
 
   export type $VirtualCartPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "VirtualCart"
     objects: {
-      user: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
       store: Prisma.$StorePayload<ExtArgs>
       items: Prisma.$CartItemPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       cart_id: string
-      user_id: string
+      user_id: string | null
       store_id: string
       created_at: Date
       expires_at: Date
@@ -9094,7 +9094,7 @@ export namespace Prisma {
    */
   export interface Prisma__VirtualCartClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends VirtualCart$userArgs<ExtArgs> = {}>(args?: Subset<T, VirtualCart$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     store<T extends StoreDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StoreDefaultArgs<ExtArgs>>): Prisma__StoreClient<$Result.GetResult<Prisma.$StorePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     items<T extends VirtualCart$itemsArgs<ExtArgs> = {}>(args?: Subset<T, VirtualCart$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CartItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -9524,6 +9524,25 @@ export namespace Prisma {
      * Limit how many VirtualCarts to delete.
      */
     limit?: number
+  }
+
+  /**
+   * VirtualCart.user
+   */
+  export type VirtualCart$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -19138,18 +19157,18 @@ export namespace Prisma {
     OR?: VirtualCartWhereInput[]
     NOT?: VirtualCartWhereInput | VirtualCartWhereInput[]
     cart_id?: StringFilter<"VirtualCart"> | string
-    user_id?: StringFilter<"VirtualCart"> | string
+    user_id?: StringNullableFilter<"VirtualCart"> | string | null
     store_id?: StringFilter<"VirtualCart"> | string
     created_at?: DateTimeFilter<"VirtualCart"> | Date | string
     expires_at?: DateTimeFilter<"VirtualCart"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     store?: XOR<StoreScalarRelationFilter, StoreWhereInput>
     items?: CartItemListRelationFilter
   }
 
   export type VirtualCartOrderByWithRelationInput = {
     cart_id?: SortOrder
-    user_id?: SortOrder
+    user_id?: SortOrderInput | SortOrder
     store_id?: SortOrder
     created_at?: SortOrder
     expires_at?: SortOrder
@@ -19163,18 +19182,18 @@ export namespace Prisma {
     AND?: VirtualCartWhereInput | VirtualCartWhereInput[]
     OR?: VirtualCartWhereInput[]
     NOT?: VirtualCartWhereInput | VirtualCartWhereInput[]
-    user_id?: StringFilter<"VirtualCart"> | string
+    user_id?: StringNullableFilter<"VirtualCart"> | string | null
     store_id?: StringFilter<"VirtualCart"> | string
     created_at?: DateTimeFilter<"VirtualCart"> | Date | string
     expires_at?: DateTimeFilter<"VirtualCart"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     store?: XOR<StoreScalarRelationFilter, StoreWhereInput>
     items?: CartItemListRelationFilter
   }, "cart_id">
 
   export type VirtualCartOrderByWithAggregationInput = {
     cart_id?: SortOrder
-    user_id?: SortOrder
+    user_id?: SortOrderInput | SortOrder
     store_id?: SortOrder
     created_at?: SortOrder
     expires_at?: SortOrder
@@ -19188,7 +19207,7 @@ export namespace Prisma {
     OR?: VirtualCartScalarWhereWithAggregatesInput[]
     NOT?: VirtualCartScalarWhereWithAggregatesInput | VirtualCartScalarWhereWithAggregatesInput[]
     cart_id?: StringWithAggregatesFilter<"VirtualCart"> | string
-    user_id?: StringWithAggregatesFilter<"VirtualCart"> | string
+    user_id?: StringNullableWithAggregatesFilter<"VirtualCart"> | string | null
     store_id?: StringWithAggregatesFilter<"VirtualCart"> | string
     created_at?: DateTimeWithAggregatesFilter<"VirtualCart"> | Date | string
     expires_at?: DateTimeWithAggregatesFilter<"VirtualCart"> | Date | string
@@ -20068,14 +20087,14 @@ export namespace Prisma {
     cart_id?: string
     created_at?: Date | string
     expires_at: Date | string
-    user: UserCreateNestedOneWithoutCartsInput
+    user?: UserCreateNestedOneWithoutCartsInput
     store: StoreCreateNestedOneWithoutVirtualCartsInput
     items?: CartItemCreateNestedManyWithoutCartInput
   }
 
   export type VirtualCartUncheckedCreateInput = {
     cart_id?: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     created_at?: Date | string
     expires_at: Date | string
@@ -20086,14 +20105,14 @@ export namespace Prisma {
     cart_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutCartsNestedInput
+    user?: UserUpdateOneWithoutCartsNestedInput
     store?: StoreUpdateOneRequiredWithoutVirtualCartsNestedInput
     items?: CartItemUpdateManyWithoutCartNestedInput
   }
 
   export type VirtualCartUncheckedUpdateInput = {
     cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20102,7 +20121,7 @@ export namespace Prisma {
 
   export type VirtualCartCreateManyInput = {
     cart_id?: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     created_at?: Date | string
     expires_at: Date | string
@@ -20116,7 +20135,7 @@ export namespace Prisma {
 
   export type VirtualCartUncheckedUpdateManyInput = {
     cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21079,9 +21098,9 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
   }
 
   export type VirtualCartCountOrderByAggregateInput = {
@@ -21145,6 +21164,11 @@ export namespace Prisma {
   export type CartItemSumOrderByAggregateInput = {
     quantity?: SortOrder
     price_at_time?: SortOrder
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
   }
 
   export type FittingCartCountOrderByAggregateInput = {
@@ -21426,11 +21450,6 @@ export namespace Prisma {
   export type ProductVariantNullableScalarRelationFilter = {
     is?: ProductVariantWhereInput | null
     isNot?: ProductVariantWhereInput | null
-  }
-
-  export type UserNullableScalarRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
   }
 
   export type AnalyticsCountOrderByAggregateInput = {
@@ -22484,10 +22503,12 @@ export namespace Prisma {
     connect?: CartItemWhereUniqueInput | CartItemWhereUniqueInput[]
   }
 
-  export type UserUpdateOneRequiredWithoutCartsNestedInput = {
+  export type UserUpdateOneWithoutCartsNestedInput = {
     create?: XOR<UserCreateWithoutCartsInput, UserUncheckedCreateWithoutCartsInput>
     connectOrCreate?: UserCreateOrConnectWithoutCartsInput
     upsert?: UserUpsertWithoutCartsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCartsInput, UserUpdateWithoutCartsInput>, UserUncheckedUpdateWithoutCartsInput>
   }
@@ -23388,13 +23409,13 @@ export namespace Prisma {
     cart_id?: string
     created_at?: Date | string
     expires_at: Date | string
-    user: UserCreateNestedOneWithoutCartsInput
+    user?: UserCreateNestedOneWithoutCartsInput
     items?: CartItemCreateNestedManyWithoutCartInput
   }
 
   export type VirtualCartUncheckedCreateWithoutStoreInput = {
     cart_id?: string
-    user_id: string
+    user_id?: string | null
     created_at?: Date | string
     expires_at: Date | string
     items?: CartItemUncheckedCreateNestedManyWithoutCartInput
@@ -23605,7 +23626,7 @@ export namespace Prisma {
     OR?: VirtualCartScalarWhereInput[]
     NOT?: VirtualCartScalarWhereInput | VirtualCartScalarWhereInput[]
     cart_id?: StringFilter<"VirtualCart"> | string
-    user_id?: StringFilter<"VirtualCart"> | string
+    user_id?: StringNullableFilter<"VirtualCart"> | string | null
     store_id?: StringFilter<"VirtualCart"> | string
     created_at?: DateTimeFilter<"VirtualCart"> | Date | string
     expires_at?: DateTimeFilter<"VirtualCart"> | Date | string
@@ -24734,13 +24755,13 @@ export namespace Prisma {
     cart_id?: string
     created_at?: Date | string
     expires_at: Date | string
-    user: UserCreateNestedOneWithoutCartsInput
+    user?: UserCreateNestedOneWithoutCartsInput
     store: StoreCreateNestedOneWithoutVirtualCartsInput
   }
 
   export type VirtualCartUncheckedCreateWithoutItemsInput = {
     cart_id?: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     created_at?: Date | string
     expires_at: Date | string
@@ -24793,13 +24814,13 @@ export namespace Prisma {
     cart_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutCartsNestedInput
+    user?: UserUpdateOneWithoutCartsNestedInput
     store?: StoreUpdateOneRequiredWithoutVirtualCartsNestedInput
   }
 
   export type VirtualCartUncheckedUpdateWithoutItemsInput = {
     cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25998,7 +26019,7 @@ export namespace Prisma {
 
   export type VirtualCartCreateManyStoreInput = {
     cart_id?: string
-    user_id: string
+    user_id?: string | null
     created_at?: Date | string
     expires_at: Date | string
   }
@@ -26165,13 +26186,13 @@ export namespace Prisma {
     cart_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutCartsNestedInput
+    user?: UserUpdateOneWithoutCartsNestedInput
     items?: CartItemUpdateManyWithoutCartNestedInput
   }
 
   export type VirtualCartUncheckedUpdateWithoutStoreInput = {
     cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: CartItemUncheckedUpdateManyWithoutCartNestedInput
@@ -26179,7 +26200,7 @@ export namespace Prisma {
 
   export type VirtualCartUncheckedUpdateManyWithoutStoreInput = {
     cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }

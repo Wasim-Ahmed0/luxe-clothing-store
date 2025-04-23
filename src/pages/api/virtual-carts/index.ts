@@ -21,13 +21,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     }
 
     // Authenticate
+    let userID: string | null = null;
     const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.id || session.user.role !== Role.customer) {
-        return res.status(401).json({ success: false, error: "Not Authenticated" });
+    if (session?.user?.id && session.user.role === Role.customer) {
+        userID = session.user.id;
     }
     
-    const userID = session.user.id;
-
     // Validate input
     const { store_id } = req.body as { store_id?: string };
     if (!store_id) {
@@ -38,25 +37,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(404).json({ success: false, error: "Store Not Found" });
     }
 
-    // Cart 2hr threshold
+    // Cart 2hr expiry
     const now = new Date();
     const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
 
-    // See if there's already an active cart in this store
-    let cart = await prisma.virtualCart.findFirst({
-        where: {
-            user_id:    userID,
-            store_id:   store_id,
-            expires_at: { gt: now },
-        },
-    });
+    let cart;
 
-    // If not, create one
+    // Try to reuse existing cart for signed-in customer
+    if (userID) {
+        cart = await prisma.virtualCart.findFirst({
+            where: {
+                user_id: userID,
+                store_id: store_id,
+                expires_at: {gt: now},
+            }
+        });
+    }
+
+    // Create new cart (guests / user (if no active cart already))
     if (!cart) {
         cart = await prisma.virtualCart.create({
             data: {
-                user:       { connect: { user_id: userID } },
-                store:      { connect: { store_id } },
+                // only connect user if we have one
+                ...(userID 
+                    ? { user: { connect: { user_id: userID } } }
+                    : {}),
+                store: { connect: { store_id } },
                 expires_at: twoHoursLater,
             },
         });
