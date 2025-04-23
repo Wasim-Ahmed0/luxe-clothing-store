@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 import { prisma } from "../../../../lib/prisma";
-import { Role } from "../../../../lib/prisma";
+import { Role } from "@/generated/prisma";
 import argon2 from "argon2";
 
 type ErrorResponse = { success: false; error: string };
