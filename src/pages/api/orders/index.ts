@@ -1,0 +1,80 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]";
+import { prisma } from "../../../../lib/prisma";
+import { OrderDetail } from "@/generated/prisma";
+
+type SuccessResp = { success: true; order_id: OrderDetail["order_id"]; checkoutToken: OrderDetail["order_id"];};
+type ErrorResp = { success: false; error: string };
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<SuccessResp | ErrorResp>) {
+    if (req.method !== "POST") {
+        res.setHeader("Allow", "POST");
+        return res.status(405).json({ success: false, error: "Method Not Allowed" });
+    }
+
+    // Must be signed in
+    const session = await getServerSession(req, res, authOptions);
+    if (!session?.user?.id) {
+        return res.status(401).json({ success: false, error: "Not Authenticated" });
+    }
+    
+    
+    const userID = session.user.id;
+
+    // Validate payload
+    const { cart_id } = req.body as { cart_id?: string };
+    if (!cart_id) {
+        return res.status(400).json({ success: false, error: "Missing cart_id" });
+    }
+
+    // Fetch the cart + items
+    const cart = await prisma.virtualCart.findUnique({
+        where: { cart_id },
+        include: { items: true },
+    });
+    
+    if (!cart) {
+        return res.status(404).json({ success: false, error: "Cart not found" });
+    }
+    
+    // Only allowing authenticated customer to pass through checkout
+    if (cart.user_id !== userID) {
+        return res.status(403).json({ success: false, error: "Forbidden" });
+    }
+    
+    const now = new Date();
+    if (cart.expires_at < now) {
+        return res.status(400).json({ success: false, error: "Cart expired" });
+    }
+
+    // Run create-order and delete-cart in one transaction
+    const result = await prisma.$transaction(async (tx) => {
+        const total = cart.items.reduce((sum, i) => sum + i.quantity * i.price_at_time, 0);
+
+        const order = await tx.order.create({
+            data: {
+                user:        { connect: { user_id: cart.user_id! } },
+                store:       { connect: { store_id: cart.store_id } },
+                order_status:"pending",
+                total_amount: total,
+                details: {
+                    create: cart.items.map(i => ({
+                        variant:            { connect: { variant_id: i.variant_id } },
+                        quantity:           i.quantity,
+                        price_at_purchase:  i.price_at_time,
+                    })),
+                },
+            },
+        });
+
+        // this will cascade‐delete its CartItem children
+        await tx.virtualCart.delete({ where: { cart_id } });
+
+        return order;
+  });
+
+    // Return a token (we’ll just use order_id)
+    return res.status(201).json({success: true, order_id: result.order_id, checkoutToken: result.order_id,});
+}
+

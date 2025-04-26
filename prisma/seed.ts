@@ -1,4 +1,5 @@
-import { prisma, Role } from '../lib/prisma'
+import { prisma } from '../lib/prisma'
+import { Role } from '@/generated/prisma';
 import argon2 from 'argon2';
 
 async function main() {
