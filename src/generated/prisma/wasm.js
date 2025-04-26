@@ -190,7 +190,7 @@ exports.Prisma.FittingRoomRequestScalarFieldEnum = {
   user_id: 'user_id',
   store_id: 'store_id',
   fitting_room_id: 'fitting_room_id',
-  requested_items: 'requested_items',
+  variant_id: 'variant_id',
   status: 'status',
   created_at: 'created_at'
 };
@@ -239,10 +239,6 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.JsonNullValueInput = {
-  JsonNull: Prisma.JsonNull
-};
-
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -251,12 +247,6 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
-};
-
-exports.Prisma.JsonNullValueFilter = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull,
-  AnyNull: Prisma.AnyNull
 };
 exports.Role = exports.$Enums.Role = {
   customer: 'customer',
@@ -272,7 +262,8 @@ exports.StockStatus = exports.$Enums.StockStatus = {
 
 exports.RequestStatus = exports.$Enums.RequestStatus = {
   pending: 'pending',
-  fulfilled: 'fulfilled'
+  fulfilled: 'fulfilled',
+  cancelled: 'cancelled'
 };
 
 exports.OrderStatus = exports.$Enums.OrderStatus = {

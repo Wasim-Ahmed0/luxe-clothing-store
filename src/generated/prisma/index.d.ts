@@ -108,7 +108,8 @@ export type StockStatus = (typeof StockStatus)[keyof typeof StockStatus]
 
 export const RequestStatus: {
   pending: 'pending',
-  fulfilled: 'fulfilled'
+  fulfilled: 'fulfilled',
+  cancelled: 'cancelled'
 };
 
 export type RequestStatus = (typeof RequestStatus)[keyof typeof RequestStatus]
@@ -2328,6 +2329,7 @@ export namespace Prisma {
     orderDetails: number
     wishlistItems: number
     analytics: number
+    fittingRequests: number
   }
 
   export type ProductVariantCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2336,6 +2338,7 @@ export namespace Prisma {
     orderDetails?: boolean | ProductVariantCountOutputTypeCountOrderDetailsArgs
     wishlistItems?: boolean | ProductVariantCountOutputTypeCountWishlistItemsArgs
     analytics?: boolean | ProductVariantCountOutputTypeCountAnalyticsArgs
+    fittingRequests?: boolean | ProductVariantCountOutputTypeCountFittingRequestsArgs
   }
 
   // Custom InputTypes
@@ -2382,6 +2385,13 @@ export namespace Prisma {
    */
   export type ProductVariantCountOutputTypeCountAnalyticsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AnalyticsWhereInput
+  }
+
+  /**
+   * ProductVariantCountOutputType without action
+   */
+  export type ProductVariantCountOutputTypeCountFittingRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FittingRoomRequestWhereInput
   }
 
 
@@ -6314,6 +6324,7 @@ export namespace Prisma {
     orderDetails?: boolean | ProductVariant$orderDetailsArgs<ExtArgs>
     wishlistItems?: boolean | ProductVariant$wishlistItemsArgs<ExtArgs>
     analytics?: boolean | ProductVariant$analyticsArgs<ExtArgs>
+    fittingRequests?: boolean | ProductVariant$fittingRequestsArgs<ExtArgs>
     _count?: boolean | ProductVariantCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["productVariant"]>
 
@@ -6348,6 +6359,7 @@ export namespace Prisma {
     orderDetails?: boolean | ProductVariant$orderDetailsArgs<ExtArgs>
     wishlistItems?: boolean | ProductVariant$wishlistItemsArgs<ExtArgs>
     analytics?: boolean | ProductVariant$analyticsArgs<ExtArgs>
+    fittingRequests?: boolean | ProductVariant$fittingRequestsArgs<ExtArgs>
     _count?: boolean | ProductVariantCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProductVariantIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6366,6 +6378,7 @@ export namespace Prisma {
       orderDetails: Prisma.$OrderDetailPayload<ExtArgs>[]
       wishlistItems: Prisma.$WishlistItemPayload<ExtArgs>[]
       analytics: Prisma.$AnalyticsPayload<ExtArgs>[]
+      fittingRequests: Prisma.$FittingRoomRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       variant_id: string
@@ -6772,6 +6785,7 @@ export namespace Prisma {
     orderDetails<T extends ProductVariant$orderDetailsArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariant$orderDetailsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderDetailPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     wishlistItems<T extends ProductVariant$wishlistItemsArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariant$wishlistItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WishlistItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     analytics<T extends ProductVariant$analyticsArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariant$analyticsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnalyticsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    fittingRequests<T extends ProductVariant$fittingRequestsArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariant$fittingRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FittingRoomRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7318,6 +7332,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AnalyticsScalarFieldEnum | AnalyticsScalarFieldEnum[]
+  }
+
+  /**
+   * ProductVariant.fittingRequests
+   */
+  export type ProductVariant$fittingRequestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FittingRoomRequest
+     */
+    select?: FittingRoomRequestSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FittingRoomRequest
+     */
+    omit?: FittingRoomRequestOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FittingRoomRequestInclude<ExtArgs> | null
+    where?: FittingRoomRequestWhereInput
+    orderBy?: FittingRoomRequestOrderByWithRelationInput | FittingRoomRequestOrderByWithRelationInput[]
+    cursor?: FittingRoomRequestWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FittingRoomRequestScalarFieldEnum | FittingRoomRequestScalarFieldEnum[]
   }
 
   /**
@@ -10827,7 +10865,7 @@ export namespace Prisma {
 
   export type FittingCartGroupByOutputType = {
     fitting_cart_id: string
-    user_id: string
+    user_id: string | null
     store_id: string
     created_at: Date
     expires_at: Date
@@ -10856,7 +10894,7 @@ export namespace Prisma {
     store_id?: boolean
     created_at?: boolean
     expires_at?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
     requests?: boolean | FittingCart$requestsArgs<ExtArgs>
     _count?: boolean | FittingCartCountOutputTypeDefaultArgs<ExtArgs>
@@ -10868,7 +10906,7 @@ export namespace Prisma {
     store_id?: boolean
     created_at?: boolean
     expires_at?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["fittingCart"]>
 
@@ -10878,7 +10916,7 @@ export namespace Prisma {
     store_id?: boolean
     created_at?: boolean
     expires_at?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["fittingCart"]>
 
@@ -10892,30 +10930,30 @@ export namespace Prisma {
 
   export type FittingCartOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"fitting_cart_id" | "user_id" | "store_id" | "created_at" | "expires_at", ExtArgs["result"]["fittingCart"]>
   export type FittingCartInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
     requests?: boolean | FittingCart$requestsArgs<ExtArgs>
     _count?: boolean | FittingCartCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type FittingCartIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
   }
   export type FittingCartIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingCart$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
   }
 
   export type $FittingCartPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "FittingCart"
     objects: {
-      user: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
       store: Prisma.$StorePayload<ExtArgs>
       requests: Prisma.$FittingRoomRequestPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       fitting_cart_id: string
-      user_id: string
+      user_id: string | null
       store_id: string
       created_at: Date
       expires_at: Date
@@ -11313,7 +11351,7 @@ export namespace Prisma {
    */
   export interface Prisma__FittingCartClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends FittingCart$userArgs<ExtArgs> = {}>(args?: Subset<T, FittingCart$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     store<T extends StoreDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StoreDefaultArgs<ExtArgs>>): Prisma__StoreClient<$Result.GetResult<Prisma.$StorePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     requests<T extends FittingCart$requestsArgs<ExtArgs> = {}>(args?: Subset<T, FittingCart$requestsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FittingRoomRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -11746,6 +11784,25 @@ export namespace Prisma {
   }
 
   /**
+   * FittingCart.user
+   */
+  export type FittingCart$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
    * FittingCart.requests
    */
   export type FittingCart$requestsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -11804,6 +11861,7 @@ export namespace Prisma {
     user_id: string | null
     store_id: string | null
     fitting_room_id: string | null
+    variant_id: string | null
     status: $Enums.RequestStatus | null
     created_at: Date | null
   }
@@ -11814,6 +11872,7 @@ export namespace Prisma {
     user_id: string | null
     store_id: string | null
     fitting_room_id: string | null
+    variant_id: string | null
     status: $Enums.RequestStatus | null
     created_at: Date | null
   }
@@ -11824,7 +11883,7 @@ export namespace Prisma {
     user_id: number
     store_id: number
     fitting_room_id: number
-    requested_items: number
+    variant_id: number
     status: number
     created_at: number
     _all: number
@@ -11837,6 +11896,7 @@ export namespace Prisma {
     user_id?: true
     store_id?: true
     fitting_room_id?: true
+    variant_id?: true
     status?: true
     created_at?: true
   }
@@ -11847,6 +11907,7 @@ export namespace Prisma {
     user_id?: true
     store_id?: true
     fitting_room_id?: true
+    variant_id?: true
     status?: true
     created_at?: true
   }
@@ -11857,7 +11918,7 @@ export namespace Prisma {
     user_id?: true
     store_id?: true
     fitting_room_id?: true
-    requested_items?: true
+    variant_id?: true
     status?: true
     created_at?: true
     _all?: true
@@ -11938,10 +11999,10 @@ export namespace Prisma {
   export type FittingRoomRequestGroupByOutputType = {
     request_id: string
     fitting_cart_id: string
-    user_id: string
+    user_id: string | null
     store_id: string
     fitting_room_id: string
-    requested_items: JsonValue
+    variant_id: string
     status: $Enums.RequestStatus
     created_at: Date
     _count: FittingRoomRequestCountAggregateOutputType | null
@@ -11969,12 +12030,13 @@ export namespace Prisma {
     user_id?: boolean
     store_id?: boolean
     fitting_room_id?: boolean
-    requested_items?: boolean
+    variant_id?: boolean
     status?: boolean
     created_at?: boolean
     fittingCart?: boolean | FittingCartDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingRoomRequest$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
+    variant?: boolean | ProductVariantDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["fittingRoomRequest"]>
 
   export type FittingRoomRequestSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -11983,12 +12045,13 @@ export namespace Prisma {
     user_id?: boolean
     store_id?: boolean
     fitting_room_id?: boolean
-    requested_items?: boolean
+    variant_id?: boolean
     status?: boolean
     created_at?: boolean
     fittingCart?: boolean | FittingCartDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingRoomRequest$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
+    variant?: boolean | ProductVariantDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["fittingRoomRequest"]>
 
   export type FittingRoomRequestSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -11997,12 +12060,13 @@ export namespace Prisma {
     user_id?: boolean
     store_id?: boolean
     fitting_room_id?: boolean
-    requested_items?: boolean
+    variant_id?: boolean
     status?: boolean
     created_at?: boolean
     fittingCart?: boolean | FittingCartDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingRoomRequest$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
+    variant?: boolean | ProductVariantDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["fittingRoomRequest"]>
 
   export type FittingRoomRequestSelectScalar = {
@@ -12011,42 +12075,46 @@ export namespace Prisma {
     user_id?: boolean
     store_id?: boolean
     fitting_room_id?: boolean
-    requested_items?: boolean
+    variant_id?: boolean
     status?: boolean
     created_at?: boolean
   }
 
-  export type FittingRoomRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"request_id" | "fitting_cart_id" | "user_id" | "store_id" | "fitting_room_id" | "requested_items" | "status" | "created_at", ExtArgs["result"]["fittingRoomRequest"]>
+  export type FittingRoomRequestOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"request_id" | "fitting_cart_id" | "user_id" | "store_id" | "fitting_room_id" | "variant_id" | "status" | "created_at", ExtArgs["result"]["fittingRoomRequest"]>
   export type FittingRoomRequestInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     fittingCart?: boolean | FittingCartDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingRoomRequest$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
+    variant?: boolean | ProductVariantDefaultArgs<ExtArgs>
   }
   export type FittingRoomRequestIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     fittingCart?: boolean | FittingCartDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingRoomRequest$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
+    variant?: boolean | ProductVariantDefaultArgs<ExtArgs>
   }
   export type FittingRoomRequestIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     fittingCart?: boolean | FittingCartDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | FittingRoomRequest$userArgs<ExtArgs>
     store?: boolean | StoreDefaultArgs<ExtArgs>
+    variant?: boolean | ProductVariantDefaultArgs<ExtArgs>
   }
 
   export type $FittingRoomRequestPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "FittingRoomRequest"
     objects: {
       fittingCart: Prisma.$FittingCartPayload<ExtArgs>
-      user: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
       store: Prisma.$StorePayload<ExtArgs>
+      variant: Prisma.$ProductVariantPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       request_id: string
       fitting_cart_id: string
-      user_id: string
+      user_id: string | null
       store_id: string
       fitting_room_id: string
-      requested_items: Prisma.JsonValue
+      variant_id: string
       status: $Enums.RequestStatus
       created_at: Date
     }, ExtArgs["result"]["fittingRoomRequest"]>
@@ -12444,8 +12512,9 @@ export namespace Prisma {
   export interface Prisma__FittingRoomRequestClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     fittingCart<T extends FittingCartDefaultArgs<ExtArgs> = {}>(args?: Subset<T, FittingCartDefaultArgs<ExtArgs>>): Prisma__FittingCartClient<$Result.GetResult<Prisma.$FittingCartPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends FittingRoomRequest$userArgs<ExtArgs> = {}>(args?: Subset<T, FittingRoomRequest$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     store<T extends StoreDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StoreDefaultArgs<ExtArgs>>): Prisma__StoreClient<$Result.GetResult<Prisma.$StorePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    variant<T extends ProductVariantDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ProductVariantDefaultArgs<ExtArgs>>): Prisma__ProductVariantClient<$Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -12480,7 +12549,7 @@ export namespace Prisma {
     readonly user_id: FieldRef<"FittingRoomRequest", 'String'>
     readonly store_id: FieldRef<"FittingRoomRequest", 'String'>
     readonly fitting_room_id: FieldRef<"FittingRoomRequest", 'String'>
-    readonly requested_items: FieldRef<"FittingRoomRequest", 'Json'>
+    readonly variant_id: FieldRef<"FittingRoomRequest", 'String'>
     readonly status: FieldRef<"FittingRoomRequest", 'RequestStatus'>
     readonly created_at: FieldRef<"FittingRoomRequest", 'DateTime'>
   }
@@ -12876,6 +12945,25 @@ export namespace Prisma {
      * Limit how many FittingRoomRequests to delete.
      */
     limit?: number
+  }
+
+  /**
+   * FittingRoomRequest.user
+   */
+  export type FittingRoomRequest$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -18548,7 +18636,7 @@ export namespace Prisma {
     user_id: 'user_id',
     store_id: 'store_id',
     fitting_room_id: 'fitting_room_id',
-    requested_items: 'requested_items',
+    variant_id: 'variant_id',
     status: 'status',
     created_at: 'created_at'
   };
@@ -18618,13 +18706,6 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-  export const JsonNullValueInput: {
-    JsonNull: typeof JsonNull
-  };
-
-  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
@@ -18639,15 +18720,6 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
-  export const JsonNullValueFilter: {
-    DbNull: typeof DbNull,
-    JsonNull: typeof JsonNull,
-    AnyNull: typeof AnyNull
-  };
-
-  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -18736,20 +18808,6 @@ export namespace Prisma {
    * Reference to a field of type 'StockStatus[]'
    */
   export type ListEnumStockStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockStatus[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -19028,6 +19086,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailListRelationFilter
     wishlistItems?: WishlistItemListRelationFilter
     analytics?: AnalyticsListRelationFilter
+    fittingRequests?: FittingRoomRequestListRelationFilter
   }
 
   export type ProductVariantOrderByWithRelationInput = {
@@ -19041,6 +19100,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailOrderByRelationAggregateInput
     wishlistItems?: WishlistItemOrderByRelationAggregateInput
     analytics?: AnalyticsOrderByRelationAggregateInput
+    fittingRequests?: FittingRoomRequestOrderByRelationAggregateInput
   }
 
   export type ProductVariantWhereUniqueInput = Prisma.AtLeast<{
@@ -19057,6 +19117,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailListRelationFilter
     wishlistItems?: WishlistItemListRelationFilter
     analytics?: AnalyticsListRelationFilter
+    fittingRequests?: FittingRoomRequestListRelationFilter
   }, "variant_id">
 
   export type ProductVariantOrderByWithAggregationInput = {
@@ -19278,18 +19339,18 @@ export namespace Prisma {
     OR?: FittingCartWhereInput[]
     NOT?: FittingCartWhereInput | FittingCartWhereInput[]
     fitting_cart_id?: StringFilter<"FittingCart"> | string
-    user_id?: StringFilter<"FittingCart"> | string
+    user_id?: StringNullableFilter<"FittingCart"> | string | null
     store_id?: StringFilter<"FittingCart"> | string
     created_at?: DateTimeFilter<"FittingCart"> | Date | string
     expires_at?: DateTimeFilter<"FittingCart"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     store?: XOR<StoreScalarRelationFilter, StoreWhereInput>
     requests?: FittingRoomRequestListRelationFilter
   }
 
   export type FittingCartOrderByWithRelationInput = {
     fitting_cart_id?: SortOrder
-    user_id?: SortOrder
+    user_id?: SortOrderInput | SortOrder
     store_id?: SortOrder
     created_at?: SortOrder
     expires_at?: SortOrder
@@ -19303,18 +19364,18 @@ export namespace Prisma {
     AND?: FittingCartWhereInput | FittingCartWhereInput[]
     OR?: FittingCartWhereInput[]
     NOT?: FittingCartWhereInput | FittingCartWhereInput[]
-    user_id?: StringFilter<"FittingCart"> | string
+    user_id?: StringNullableFilter<"FittingCart"> | string | null
     store_id?: StringFilter<"FittingCart"> | string
     created_at?: DateTimeFilter<"FittingCart"> | Date | string
     expires_at?: DateTimeFilter<"FittingCart"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     store?: XOR<StoreScalarRelationFilter, StoreWhereInput>
     requests?: FittingRoomRequestListRelationFilter
   }, "fitting_cart_id">
 
   export type FittingCartOrderByWithAggregationInput = {
     fitting_cart_id?: SortOrder
-    user_id?: SortOrder
+    user_id?: SortOrderInput | SortOrder
     store_id?: SortOrder
     created_at?: SortOrder
     expires_at?: SortOrder
@@ -19328,7 +19389,7 @@ export namespace Prisma {
     OR?: FittingCartScalarWhereWithAggregatesInput[]
     NOT?: FittingCartScalarWhereWithAggregatesInput | FittingCartScalarWhereWithAggregatesInput[]
     fitting_cart_id?: StringWithAggregatesFilter<"FittingCart"> | string
-    user_id?: StringWithAggregatesFilter<"FittingCart"> | string
+    user_id?: StringNullableWithAggregatesFilter<"FittingCart"> | string | null
     store_id?: StringWithAggregatesFilter<"FittingCart"> | string
     created_at?: DateTimeWithAggregatesFilter<"FittingCart"> | Date | string
     expires_at?: DateTimeWithAggregatesFilter<"FittingCart"> | Date | string
@@ -19340,29 +19401,31 @@ export namespace Prisma {
     NOT?: FittingRoomRequestWhereInput | FittingRoomRequestWhereInput[]
     request_id?: StringFilter<"FittingRoomRequest"> | string
     fitting_cart_id?: StringFilter<"FittingRoomRequest"> | string
-    user_id?: StringFilter<"FittingRoomRequest"> | string
+    user_id?: StringNullableFilter<"FittingRoomRequest"> | string | null
     store_id?: StringFilter<"FittingRoomRequest"> | string
     fitting_room_id?: StringFilter<"FittingRoomRequest"> | string
-    requested_items?: JsonFilter<"FittingRoomRequest">
+    variant_id?: StringFilter<"FittingRoomRequest"> | string
     status?: EnumRequestStatusFilter<"FittingRoomRequest"> | $Enums.RequestStatus
     created_at?: DateTimeFilter<"FittingRoomRequest"> | Date | string
     fittingCart?: XOR<FittingCartScalarRelationFilter, FittingCartWhereInput>
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     store?: XOR<StoreScalarRelationFilter, StoreWhereInput>
+    variant?: XOR<ProductVariantScalarRelationFilter, ProductVariantWhereInput>
   }
 
   export type FittingRoomRequestOrderByWithRelationInput = {
     request_id?: SortOrder
     fitting_cart_id?: SortOrder
-    user_id?: SortOrder
+    user_id?: SortOrderInput | SortOrder
     store_id?: SortOrder
     fitting_room_id?: SortOrder
-    requested_items?: SortOrder
+    variant_id?: SortOrder
     status?: SortOrder
     created_at?: SortOrder
     fittingCart?: FittingCartOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
     store?: StoreOrderByWithRelationInput
+    variant?: ProductVariantOrderByWithRelationInput
   }
 
   export type FittingRoomRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -19371,24 +19434,25 @@ export namespace Prisma {
     OR?: FittingRoomRequestWhereInput[]
     NOT?: FittingRoomRequestWhereInput | FittingRoomRequestWhereInput[]
     fitting_cart_id?: StringFilter<"FittingRoomRequest"> | string
-    user_id?: StringFilter<"FittingRoomRequest"> | string
+    user_id?: StringNullableFilter<"FittingRoomRequest"> | string | null
     store_id?: StringFilter<"FittingRoomRequest"> | string
     fitting_room_id?: StringFilter<"FittingRoomRequest"> | string
-    requested_items?: JsonFilter<"FittingRoomRequest">
+    variant_id?: StringFilter<"FittingRoomRequest"> | string
     status?: EnumRequestStatusFilter<"FittingRoomRequest"> | $Enums.RequestStatus
     created_at?: DateTimeFilter<"FittingRoomRequest"> | Date | string
     fittingCart?: XOR<FittingCartScalarRelationFilter, FittingCartWhereInput>
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     store?: XOR<StoreScalarRelationFilter, StoreWhereInput>
+    variant?: XOR<ProductVariantScalarRelationFilter, ProductVariantWhereInput>
   }, "request_id">
 
   export type FittingRoomRequestOrderByWithAggregationInput = {
     request_id?: SortOrder
     fitting_cart_id?: SortOrder
-    user_id?: SortOrder
+    user_id?: SortOrderInput | SortOrder
     store_id?: SortOrder
     fitting_room_id?: SortOrder
-    requested_items?: SortOrder
+    variant_id?: SortOrder
     status?: SortOrder
     created_at?: SortOrder
     _count?: FittingRoomRequestCountOrderByAggregateInput
@@ -19402,10 +19466,10 @@ export namespace Prisma {
     NOT?: FittingRoomRequestScalarWhereWithAggregatesInput | FittingRoomRequestScalarWhereWithAggregatesInput[]
     request_id?: StringWithAggregatesFilter<"FittingRoomRequest"> | string
     fitting_cart_id?: StringWithAggregatesFilter<"FittingRoomRequest"> | string
-    user_id?: StringWithAggregatesFilter<"FittingRoomRequest"> | string
+    user_id?: StringNullableWithAggregatesFilter<"FittingRoomRequest"> | string | null
     store_id?: StringWithAggregatesFilter<"FittingRoomRequest"> | string
     fitting_room_id?: StringWithAggregatesFilter<"FittingRoomRequest"> | string
-    requested_items?: JsonWithAggregatesFilter<"FittingRoomRequest">
+    variant_id?: StringWithAggregatesFilter<"FittingRoomRequest"> | string
     status?: EnumRequestStatusWithAggregatesFilter<"FittingRoomRequest"> | $Enums.RequestStatus
     created_at?: DateTimeWithAggregatesFilter<"FittingRoomRequest"> | Date | string
   }
@@ -19958,6 +20022,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateInput = {
@@ -19970,6 +20035,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUncheckedCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemUncheckedCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsUncheckedCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUpdateInput = {
@@ -19982,6 +20048,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateInput = {
@@ -19994,6 +20061,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUncheckedUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUncheckedUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUncheckedUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantCreateManyInput = {
@@ -20199,14 +20267,14 @@ export namespace Prisma {
     fitting_cart_id?: string
     created_at?: Date | string
     expires_at: Date | string
-    user: UserCreateNestedOneWithoutFittingCartsInput
+    user?: UserCreateNestedOneWithoutFittingCartsInput
     store: StoreCreateNestedOneWithoutFittingCartsInput
     requests?: FittingRoomRequestCreateNestedManyWithoutFittingCartInput
   }
 
   export type FittingCartUncheckedCreateInput = {
     fitting_cart_id?: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     created_at?: Date | string
     expires_at: Date | string
@@ -20217,14 +20285,14 @@ export namespace Prisma {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutFittingCartsNestedInput
+    user?: UserUpdateOneWithoutFittingCartsNestedInput
     store?: StoreUpdateOneRequiredWithoutFittingCartsNestedInput
     requests?: FittingRoomRequestUpdateManyWithoutFittingCartNestedInput
   }
 
   export type FittingCartUncheckedUpdateInput = {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20233,7 +20301,7 @@ export namespace Prisma {
 
   export type FittingCartCreateManyInput = {
     fitting_cart_id?: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     created_at?: Date | string
     expires_at: Date | string
@@ -20247,7 +20315,7 @@ export namespace Prisma {
 
   export type FittingCartUncheckedUpdateManyInput = {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20256,21 +20324,21 @@ export namespace Prisma {
   export type FittingRoomRequestCreateInput = {
     request_id?: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
     status?: $Enums.RequestStatus
     created_at?: Date | string
     fittingCart: FittingCartCreateNestedOneWithoutRequestsInput
-    user: UserCreateNestedOneWithoutFittingRequestsInput
+    user?: UserCreateNestedOneWithoutFittingRequestsInput
     store: StoreCreateNestedOneWithoutFittingRequestsInput
+    variant: ProductVariantCreateNestedOneWithoutFittingRequestsInput
   }
 
   export type FittingRoomRequestUncheckedCreateInput = {
     request_id?: string
     fitting_cart_id: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
+    variant_id: string
     status?: $Enums.RequestStatus
     created_at?: Date | string
   }
@@ -20278,21 +20346,21 @@ export namespace Prisma {
   export type FittingRoomRequestUpdateInput = {
     request_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     fittingCart?: FittingCartUpdateOneRequiredWithoutRequestsNestedInput
-    user?: UserUpdateOneRequiredWithoutFittingRequestsNestedInput
+    user?: UserUpdateOneWithoutFittingRequestsNestedInput
     store?: StoreUpdateOneRequiredWithoutFittingRequestsNestedInput
+    variant?: ProductVariantUpdateOneRequiredWithoutFittingRequestsNestedInput
   }
 
   export type FittingRoomRequestUncheckedUpdateInput = {
     request_id?: StringFieldUpdateOperationsInput | string
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
+    variant_id?: StringFieldUpdateOperationsInput | string
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20300,10 +20368,10 @@ export namespace Prisma {
   export type FittingRoomRequestCreateManyInput = {
     request_id?: string
     fitting_cart_id: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
+    variant_id: string
     status?: $Enums.RequestStatus
     created_at?: Date | string
   }
@@ -20311,7 +20379,6 @@ export namespace Prisma {
   export type FittingRoomRequestUpdateManyMutationInput = {
     request_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20319,10 +20386,10 @@ export namespace Prisma {
   export type FittingRoomRequestUncheckedUpdateManyInput = {
     request_id?: StringFieldUpdateOperationsInput | string
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
+    variant_id?: StringFieldUpdateOperationsInput | string
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21166,11 +21233,6 @@ export namespace Prisma {
     price_at_time?: SortOrder
   }
 
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
-  }
-
   export type FittingCartCountOrderByAggregateInput = {
     fitting_cart_id?: SortOrder
     user_id?: SortOrder
@@ -21194,29 +21256,6 @@ export namespace Prisma {
     created_at?: SortOrder
     expires_at?: SortOrder
   }
-  export type JsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type EnumRequestStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
@@ -21236,7 +21275,7 @@ export namespace Prisma {
     user_id?: SortOrder
     store_id?: SortOrder
     fitting_room_id?: SortOrder
-    requested_items?: SortOrder
+    variant_id?: SortOrder
     status?: SortOrder
     created_at?: SortOrder
   }
@@ -21247,6 +21286,7 @@ export namespace Prisma {
     user_id?: SortOrder
     store_id?: SortOrder
     fitting_room_id?: SortOrder
+    variant_id?: SortOrder
     status?: SortOrder
     created_at?: SortOrder
   }
@@ -21257,34 +21297,9 @@ export namespace Prisma {
     user_id?: SortOrder
     store_id?: SortOrder
     fitting_room_id?: SortOrder
+    variant_id?: SortOrder
     status?: SortOrder
     created_at?: SortOrder
-  }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type EnumRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -21302,6 +21317,11 @@ export namespace Prisma {
     in?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.OrderStatus[] | ListEnumOrderStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumOrderStatusFilter<$PrismaModel> | $Enums.OrderStatus
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
   }
 
   export type OrderCountOrderByAggregateInput = {
@@ -22236,6 +22256,13 @@ export namespace Prisma {
     connect?: AnalyticsWhereUniqueInput | AnalyticsWhereUniqueInput[]
   }
 
+  export type FittingRoomRequestCreateNestedManyWithoutVariantInput = {
+    create?: XOR<FittingRoomRequestCreateWithoutVariantInput, FittingRoomRequestUncheckedCreateWithoutVariantInput> | FittingRoomRequestCreateWithoutVariantInput[] | FittingRoomRequestUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: FittingRoomRequestCreateOrConnectWithoutVariantInput | FittingRoomRequestCreateOrConnectWithoutVariantInput[]
+    createMany?: FittingRoomRequestCreateManyVariantInputEnvelope
+    connect?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
+  }
+
   export type InventoryUncheckedCreateNestedManyWithoutVariantInput = {
     create?: XOR<InventoryCreateWithoutVariantInput, InventoryUncheckedCreateWithoutVariantInput> | InventoryCreateWithoutVariantInput[] | InventoryUncheckedCreateWithoutVariantInput[]
     connectOrCreate?: InventoryCreateOrConnectWithoutVariantInput | InventoryCreateOrConnectWithoutVariantInput[]
@@ -22269,6 +22296,13 @@ export namespace Prisma {
     connectOrCreate?: AnalyticsCreateOrConnectWithoutVariantInput | AnalyticsCreateOrConnectWithoutVariantInput[]
     createMany?: AnalyticsCreateManyVariantInputEnvelope
     connect?: AnalyticsWhereUniqueInput | AnalyticsWhereUniqueInput[]
+  }
+
+  export type FittingRoomRequestUncheckedCreateNestedManyWithoutVariantInput = {
+    create?: XOR<FittingRoomRequestCreateWithoutVariantInput, FittingRoomRequestUncheckedCreateWithoutVariantInput> | FittingRoomRequestCreateWithoutVariantInput[] | FittingRoomRequestUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: FittingRoomRequestCreateOrConnectWithoutVariantInput | FittingRoomRequestCreateOrConnectWithoutVariantInput[]
+    createMany?: FittingRoomRequestCreateManyVariantInputEnvelope
+    connect?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
   }
 
   export type ProductUpdateOneRequiredWithoutVariantsNestedInput = {
@@ -22349,6 +22383,20 @@ export namespace Prisma {
     deleteMany?: AnalyticsScalarWhereInput | AnalyticsScalarWhereInput[]
   }
 
+  export type FittingRoomRequestUpdateManyWithoutVariantNestedInput = {
+    create?: XOR<FittingRoomRequestCreateWithoutVariantInput, FittingRoomRequestUncheckedCreateWithoutVariantInput> | FittingRoomRequestCreateWithoutVariantInput[] | FittingRoomRequestUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: FittingRoomRequestCreateOrConnectWithoutVariantInput | FittingRoomRequestCreateOrConnectWithoutVariantInput[]
+    upsert?: FittingRoomRequestUpsertWithWhereUniqueWithoutVariantInput | FittingRoomRequestUpsertWithWhereUniqueWithoutVariantInput[]
+    createMany?: FittingRoomRequestCreateManyVariantInputEnvelope
+    set?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
+    disconnect?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
+    delete?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
+    connect?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
+    update?: FittingRoomRequestUpdateWithWhereUniqueWithoutVariantInput | FittingRoomRequestUpdateWithWhereUniqueWithoutVariantInput[]
+    updateMany?: FittingRoomRequestUpdateManyWithWhereWithoutVariantInput | FittingRoomRequestUpdateManyWithWhereWithoutVariantInput[]
+    deleteMany?: FittingRoomRequestScalarWhereInput | FittingRoomRequestScalarWhereInput[]
+  }
+
   export type InventoryUncheckedUpdateManyWithoutVariantNestedInput = {
     create?: XOR<InventoryCreateWithoutVariantInput, InventoryUncheckedCreateWithoutVariantInput> | InventoryCreateWithoutVariantInput[] | InventoryUncheckedCreateWithoutVariantInput[]
     connectOrCreate?: InventoryCreateOrConnectWithoutVariantInput | InventoryCreateOrConnectWithoutVariantInput[]
@@ -22417,6 +22465,20 @@ export namespace Prisma {
     update?: AnalyticsUpdateWithWhereUniqueWithoutVariantInput | AnalyticsUpdateWithWhereUniqueWithoutVariantInput[]
     updateMany?: AnalyticsUpdateManyWithWhereWithoutVariantInput | AnalyticsUpdateManyWithWhereWithoutVariantInput[]
     deleteMany?: AnalyticsScalarWhereInput | AnalyticsScalarWhereInput[]
+  }
+
+  export type FittingRoomRequestUncheckedUpdateManyWithoutVariantNestedInput = {
+    create?: XOR<FittingRoomRequestCreateWithoutVariantInput, FittingRoomRequestUncheckedCreateWithoutVariantInput> | FittingRoomRequestCreateWithoutVariantInput[] | FittingRoomRequestUncheckedCreateWithoutVariantInput[]
+    connectOrCreate?: FittingRoomRequestCreateOrConnectWithoutVariantInput | FittingRoomRequestCreateOrConnectWithoutVariantInput[]
+    upsert?: FittingRoomRequestUpsertWithWhereUniqueWithoutVariantInput | FittingRoomRequestUpsertWithWhereUniqueWithoutVariantInput[]
+    createMany?: FittingRoomRequestCreateManyVariantInputEnvelope
+    set?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
+    disconnect?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
+    delete?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
+    connect?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
+    update?: FittingRoomRequestUpdateWithWhereUniqueWithoutVariantInput | FittingRoomRequestUpdateWithWhereUniqueWithoutVariantInput[]
+    updateMany?: FittingRoomRequestUpdateManyWithWhereWithoutVariantInput | FittingRoomRequestUpdateManyWithWhereWithoutVariantInput[]
+    deleteMany?: FittingRoomRequestScalarWhereInput | FittingRoomRequestScalarWhereInput[]
   }
 
   export type StoreCreateNestedOneWithoutInventoryInput = {
@@ -22603,10 +22665,12 @@ export namespace Prisma {
     connect?: FittingRoomRequestWhereUniqueInput | FittingRoomRequestWhereUniqueInput[]
   }
 
-  export type UserUpdateOneRequiredWithoutFittingCartsNestedInput = {
+  export type UserUpdateOneWithoutFittingCartsNestedInput = {
     create?: XOR<UserCreateWithoutFittingCartsInput, UserUncheckedCreateWithoutFittingCartsInput>
     connectOrCreate?: UserCreateOrConnectWithoutFittingCartsInput
     upsert?: UserUpsertWithoutFittingCartsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFittingCartsInput, UserUpdateWithoutFittingCartsInput>, UserUncheckedUpdateWithoutFittingCartsInput>
   }
@@ -22665,6 +22729,12 @@ export namespace Prisma {
     connect?: StoreWhereUniqueInput
   }
 
+  export type ProductVariantCreateNestedOneWithoutFittingRequestsInput = {
+    create?: XOR<ProductVariantCreateWithoutFittingRequestsInput, ProductVariantUncheckedCreateWithoutFittingRequestsInput>
+    connectOrCreate?: ProductVariantCreateOrConnectWithoutFittingRequestsInput
+    connect?: ProductVariantWhereUniqueInput
+  }
+
   export type EnumRequestStatusFieldUpdateOperationsInput = {
     set?: $Enums.RequestStatus
   }
@@ -22677,10 +22747,12 @@ export namespace Prisma {
     update?: XOR<XOR<FittingCartUpdateToOneWithWhereWithoutRequestsInput, FittingCartUpdateWithoutRequestsInput>, FittingCartUncheckedUpdateWithoutRequestsInput>
   }
 
-  export type UserUpdateOneRequiredWithoutFittingRequestsNestedInput = {
+  export type UserUpdateOneWithoutFittingRequestsNestedInput = {
     create?: XOR<UserCreateWithoutFittingRequestsInput, UserUncheckedCreateWithoutFittingRequestsInput>
     connectOrCreate?: UserCreateOrConnectWithoutFittingRequestsInput
     upsert?: UserUpsertWithoutFittingRequestsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFittingRequestsInput, UserUpdateWithoutFittingRequestsInput>, UserUncheckedUpdateWithoutFittingRequestsInput>
   }
@@ -22691,6 +22763,14 @@ export namespace Prisma {
     upsert?: StoreUpsertWithoutFittingRequestsInput
     connect?: StoreWhereUniqueInput
     update?: XOR<XOR<StoreUpdateToOneWithWhereWithoutFittingRequestsInput, StoreUpdateWithoutFittingRequestsInput>, StoreUncheckedUpdateWithoutFittingRequestsInput>
+  }
+
+  export type ProductVariantUpdateOneRequiredWithoutFittingRequestsNestedInput = {
+    create?: XOR<ProductVariantCreateWithoutFittingRequestsInput, ProductVariantUncheckedCreateWithoutFittingRequestsInput>
+    connectOrCreate?: ProductVariantCreateOrConnectWithoutFittingRequestsInput
+    upsert?: ProductVariantUpsertWithoutFittingRequestsInput
+    connect?: ProductVariantWhereUniqueInput
+    update?: XOR<XOR<ProductVariantUpdateToOneWithWhereWithoutFittingRequestsInput, ProductVariantUpdateWithoutFittingRequestsInput>, ProductVariantUncheckedUpdateWithoutFittingRequestsInput>
   }
 
   export type UserCreateNestedOneWithoutOrdersInput = {
@@ -23156,29 +23236,6 @@ export namespace Prisma {
     notIn?: $Enums.RequestStatus[] | ListEnumRequestStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumRequestStatusFilter<$PrismaModel> | $Enums.RequestStatus
   }
-  export type NestedJsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type NestedEnumRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.RequestStatus | EnumRequestStatusFieldRefInput<$PrismaModel>
@@ -23355,13 +23412,13 @@ export namespace Prisma {
     fitting_cart_id?: string
     created_at?: Date | string
     expires_at: Date | string
-    user: UserCreateNestedOneWithoutFittingCartsInput
+    user?: UserCreateNestedOneWithoutFittingCartsInput
     requests?: FittingRoomRequestCreateNestedManyWithoutFittingCartInput
   }
 
   export type FittingCartUncheckedCreateWithoutStoreInput = {
     fitting_cart_id?: string
-    user_id: string
+    user_id?: string | null
     created_at?: Date | string
     expires_at: Date | string
     requests?: FittingRoomRequestUncheckedCreateNestedManyWithoutFittingCartInput
@@ -23434,19 +23491,19 @@ export namespace Prisma {
   export type FittingRoomRequestCreateWithoutStoreInput = {
     request_id?: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
     status?: $Enums.RequestStatus
     created_at?: Date | string
     fittingCart: FittingCartCreateNestedOneWithoutRequestsInput
-    user: UserCreateNestedOneWithoutFittingRequestsInput
+    user?: UserCreateNestedOneWithoutFittingRequestsInput
+    variant: ProductVariantCreateNestedOneWithoutFittingRequestsInput
   }
 
   export type FittingRoomRequestUncheckedCreateWithoutStoreInput = {
     request_id?: string
     fitting_cart_id: string
-    user_id: string
+    user_id?: string | null
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
+    variant_id: string
     status?: $Enums.RequestStatus
     created_at?: Date | string
   }
@@ -23570,7 +23627,7 @@ export namespace Prisma {
     OR?: FittingCartScalarWhereInput[]
     NOT?: FittingCartScalarWhereInput | FittingCartScalarWhereInput[]
     fitting_cart_id?: StringFilter<"FittingCart"> | string
-    user_id?: StringFilter<"FittingCart"> | string
+    user_id?: StringNullableFilter<"FittingCart"> | string | null
     store_id?: StringFilter<"FittingCart"> | string
     created_at?: DateTimeFilter<"FittingCart"> | Date | string
     expires_at?: DateTimeFilter<"FittingCart"> | Date | string
@@ -23654,10 +23711,10 @@ export namespace Prisma {
     NOT?: FittingRoomRequestScalarWhereInput | FittingRoomRequestScalarWhereInput[]
     request_id?: StringFilter<"FittingRoomRequest"> | string
     fitting_cart_id?: StringFilter<"FittingRoomRequest"> | string
-    user_id?: StringFilter<"FittingRoomRequest"> | string
+    user_id?: StringNullableFilter<"FittingRoomRequest"> | string | null
     store_id?: StringFilter<"FittingRoomRequest"> | string
     fitting_room_id?: StringFilter<"FittingRoomRequest"> | string
-    requested_items?: JsonFilter<"FittingRoomRequest">
+    variant_id?: StringFilter<"FittingRoomRequest"> | string
     status?: EnumRequestStatusFilter<"FittingRoomRequest"> | $Enums.RequestStatus
     created_at?: DateTimeFilter<"FittingRoomRequest"> | Date | string
   }
@@ -23826,11 +23883,11 @@ export namespace Prisma {
   export type FittingRoomRequestCreateWithoutUserInput = {
     request_id?: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
     status?: $Enums.RequestStatus
     created_at?: Date | string
     fittingCart: FittingCartCreateNestedOneWithoutRequestsInput
     store: StoreCreateNestedOneWithoutFittingRequestsInput
+    variant: ProductVariantCreateNestedOneWithoutFittingRequestsInput
   }
 
   export type FittingRoomRequestUncheckedCreateWithoutUserInput = {
@@ -23838,7 +23895,7 @@ export namespace Prisma {
     fitting_cart_id: string
     store_id: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
+    variant_id: string
     status?: $Enums.RequestStatus
     created_at?: Date | string
   }
@@ -24003,6 +24060,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutProductInput = {
@@ -24014,6 +24072,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUncheckedCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemUncheckedCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsUncheckedCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutProductInput = {
@@ -24243,6 +24302,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FittingRoomRequestCreateWithoutVariantInput = {
+    request_id?: string
+    fitting_room_id: string
+    status?: $Enums.RequestStatus
+    created_at?: Date | string
+    fittingCart: FittingCartCreateNestedOneWithoutRequestsInput
+    user?: UserCreateNestedOneWithoutFittingRequestsInput
+    store: StoreCreateNestedOneWithoutFittingRequestsInput
+  }
+
+  export type FittingRoomRequestUncheckedCreateWithoutVariantInput = {
+    request_id?: string
+    fitting_cart_id: string
+    user_id?: string | null
+    store_id: string
+    fitting_room_id: string
+    status?: $Enums.RequestStatus
+    created_at?: Date | string
+  }
+
+  export type FittingRoomRequestCreateOrConnectWithoutVariantInput = {
+    where: FittingRoomRequestWhereUniqueInput
+    create: XOR<FittingRoomRequestCreateWithoutVariantInput, FittingRoomRequestUncheckedCreateWithoutVariantInput>
+  }
+
+  export type FittingRoomRequestCreateManyVariantInputEnvelope = {
+    data: FittingRoomRequestCreateManyVariantInput | FittingRoomRequestCreateManyVariantInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ProductUpsertWithoutVariantsInput = {
     update: XOR<ProductUpdateWithoutVariantsInput, ProductUncheckedUpdateWithoutVariantsInput>
     create: XOR<ProductCreateWithoutVariantsInput, ProductUncheckedCreateWithoutVariantsInput>
@@ -24383,6 +24472,22 @@ export namespace Prisma {
     data: XOR<AnalyticsUpdateManyMutationInput, AnalyticsUncheckedUpdateManyWithoutVariantInput>
   }
 
+  export type FittingRoomRequestUpsertWithWhereUniqueWithoutVariantInput = {
+    where: FittingRoomRequestWhereUniqueInput
+    update: XOR<FittingRoomRequestUpdateWithoutVariantInput, FittingRoomRequestUncheckedUpdateWithoutVariantInput>
+    create: XOR<FittingRoomRequestCreateWithoutVariantInput, FittingRoomRequestUncheckedCreateWithoutVariantInput>
+  }
+
+  export type FittingRoomRequestUpdateWithWhereUniqueWithoutVariantInput = {
+    where: FittingRoomRequestWhereUniqueInput
+    data: XOR<FittingRoomRequestUpdateWithoutVariantInput, FittingRoomRequestUncheckedUpdateWithoutVariantInput>
+  }
+
+  export type FittingRoomRequestUpdateManyWithWhereWithoutVariantInput = {
+    where: FittingRoomRequestScalarWhereInput
+    data: XOR<FittingRoomRequestUpdateManyMutationInput, FittingRoomRequestUncheckedUpdateManyWithoutVariantInput>
+  }
+
   export type StoreCreateWithoutInventoryInput = {
     store_id?: string
     store_name: string
@@ -24446,6 +24551,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutInventoryInput = {
@@ -24457,6 +24563,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUncheckedCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemUncheckedCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsUncheckedCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutInventoryInput = {
@@ -24550,6 +24657,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutInventoryInput = {
@@ -24561,6 +24669,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUncheckedUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUncheckedUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUncheckedUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type UserCreateWithoutCartsInput = {
@@ -24781,6 +24890,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutCartItemsInput = {
@@ -24792,6 +24902,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUncheckedCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemUncheckedCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsUncheckedCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutCartItemsInput = {
@@ -24846,6 +24957,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutCartItemsInput = {
@@ -24857,6 +24969,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUncheckedUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUncheckedUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUncheckedUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type UserCreateWithoutFittingCartsInput = {
@@ -24930,19 +25043,19 @@ export namespace Prisma {
   export type FittingRoomRequestCreateWithoutFittingCartInput = {
     request_id?: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
     status?: $Enums.RequestStatus
     created_at?: Date | string
-    user: UserCreateNestedOneWithoutFittingRequestsInput
+    user?: UserCreateNestedOneWithoutFittingRequestsInput
     store: StoreCreateNestedOneWithoutFittingRequestsInput
+    variant: ProductVariantCreateNestedOneWithoutFittingRequestsInput
   }
 
   export type FittingRoomRequestUncheckedCreateWithoutFittingCartInput = {
     request_id?: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
+    variant_id: string
     status?: $Enums.RequestStatus
     created_at?: Date | string
   }
@@ -25057,13 +25170,13 @@ export namespace Prisma {
     fitting_cart_id?: string
     created_at?: Date | string
     expires_at: Date | string
-    user: UserCreateNestedOneWithoutFittingCartsInput
+    user?: UserCreateNestedOneWithoutFittingCartsInput
     store: StoreCreateNestedOneWithoutFittingCartsInput
   }
 
   export type FittingCartUncheckedCreateWithoutRequestsInput = {
     fitting_cart_id?: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     created_at?: Date | string
     expires_at: Date | string
@@ -25142,6 +25255,35 @@ export namespace Prisma {
     create: XOR<StoreCreateWithoutFittingRequestsInput, StoreUncheckedCreateWithoutFittingRequestsInput>
   }
 
+  export type ProductVariantCreateWithoutFittingRequestsInput = {
+    variant_id?: string
+    size: string
+    color: string
+    product: ProductCreateNestedOneWithoutVariantsInput
+    inventory?: InventoryCreateNestedManyWithoutVariantInput
+    cartItems?: CartItemCreateNestedManyWithoutVariantInput
+    orderDetails?: OrderDetailCreateNestedManyWithoutVariantInput
+    wishlistItems?: WishlistItemCreateNestedManyWithoutVariantInput
+    analytics?: AnalyticsCreateNestedManyWithoutVariantInput
+  }
+
+  export type ProductVariantUncheckedCreateWithoutFittingRequestsInput = {
+    variant_id?: string
+    product_id: string
+    size: string
+    color: string
+    inventory?: InventoryUncheckedCreateNestedManyWithoutVariantInput
+    cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
+    orderDetails?: OrderDetailUncheckedCreateNestedManyWithoutVariantInput
+    wishlistItems?: WishlistItemUncheckedCreateNestedManyWithoutVariantInput
+    analytics?: AnalyticsUncheckedCreateNestedManyWithoutVariantInput
+  }
+
+  export type ProductVariantCreateOrConnectWithoutFittingRequestsInput = {
+    where: ProductVariantWhereUniqueInput
+    create: XOR<ProductVariantCreateWithoutFittingRequestsInput, ProductVariantUncheckedCreateWithoutFittingRequestsInput>
+  }
+
   export type FittingCartUpsertWithoutRequestsInput = {
     update: XOR<FittingCartUpdateWithoutRequestsInput, FittingCartUncheckedUpdateWithoutRequestsInput>
     create: XOR<FittingCartCreateWithoutRequestsInput, FittingCartUncheckedCreateWithoutRequestsInput>
@@ -25157,13 +25299,13 @@ export namespace Prisma {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutFittingCartsNestedInput
+    user?: UserUpdateOneWithoutFittingCartsNestedInput
     store?: StoreUpdateOneRequiredWithoutFittingCartsNestedInput
   }
 
   export type FittingCartUncheckedUpdateWithoutRequestsInput = {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25247,6 +25389,41 @@ export namespace Prisma {
     fittingCarts?: FittingCartUncheckedUpdateManyWithoutStoreNestedInput
     analytics?: AnalyticsUncheckedUpdateManyWithoutStoreNestedInput
     virtualCarts?: VirtualCartUncheckedUpdateManyWithoutStoreNestedInput
+  }
+
+  export type ProductVariantUpsertWithoutFittingRequestsInput = {
+    update: XOR<ProductVariantUpdateWithoutFittingRequestsInput, ProductVariantUncheckedUpdateWithoutFittingRequestsInput>
+    create: XOR<ProductVariantCreateWithoutFittingRequestsInput, ProductVariantUncheckedCreateWithoutFittingRequestsInput>
+    where?: ProductVariantWhereInput
+  }
+
+  export type ProductVariantUpdateToOneWithWhereWithoutFittingRequestsInput = {
+    where?: ProductVariantWhereInput
+    data: XOR<ProductVariantUpdateWithoutFittingRequestsInput, ProductVariantUncheckedUpdateWithoutFittingRequestsInput>
+  }
+
+  export type ProductVariantUpdateWithoutFittingRequestsInput = {
+    variant_id?: StringFieldUpdateOperationsInput | string
+    size?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    product?: ProductUpdateOneRequiredWithoutVariantsNestedInput
+    inventory?: InventoryUpdateManyWithoutVariantNestedInput
+    cartItems?: CartItemUpdateManyWithoutVariantNestedInput
+    orderDetails?: OrderDetailUpdateManyWithoutVariantNestedInput
+    wishlistItems?: WishlistItemUpdateManyWithoutVariantNestedInput
+    analytics?: AnalyticsUpdateManyWithoutVariantNestedInput
+  }
+
+  export type ProductVariantUncheckedUpdateWithoutFittingRequestsInput = {
+    variant_id?: StringFieldUpdateOperationsInput | string
+    product_id?: StringFieldUpdateOperationsInput | string
+    size?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    inventory?: InventoryUncheckedUpdateManyWithoutVariantNestedInput
+    cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
+    orderDetails?: OrderDetailUncheckedUpdateManyWithoutVariantNestedInput
+    wishlistItems?: WishlistItemUncheckedUpdateManyWithoutVariantNestedInput
+    analytics?: AnalyticsUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type UserCreateWithoutOrdersInput = {
@@ -25471,6 +25648,7 @@ export namespace Prisma {
     cartItems?: CartItemCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutOrderDetailsInput = {
@@ -25482,6 +25660,7 @@ export namespace Prisma {
     cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemUncheckedCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsUncheckedCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutOrderDetailsInput = {
@@ -25540,6 +25719,7 @@ export namespace Prisma {
     cartItems?: CartItemUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutOrderDetailsInput = {
@@ -25551,6 +25731,7 @@ export namespace Prisma {
     cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUncheckedUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUncheckedUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type UserCreateWithoutWishlistsInput = {
@@ -25693,6 +25874,7 @@ export namespace Prisma {
     cartItems?: CartItemCreateNestedManyWithoutVariantInput
     orderDetails?: OrderDetailCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutWishlistItemsInput = {
@@ -25704,6 +25886,7 @@ export namespace Prisma {
     cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
     orderDetails?: OrderDetailUncheckedCreateNestedManyWithoutVariantInput
     analytics?: AnalyticsUncheckedCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutWishlistItemsInput = {
@@ -25752,6 +25935,7 @@ export namespace Prisma {
     cartItems?: CartItemUpdateManyWithoutVariantNestedInput
     orderDetails?: OrderDetailUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutWishlistItemsInput = {
@@ -25763,6 +25947,7 @@ export namespace Prisma {
     cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
     orderDetails?: OrderDetailUncheckedUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUncheckedUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantCreateWithoutAnalyticsInput = {
@@ -25774,6 +25959,7 @@ export namespace Prisma {
     cartItems?: CartItemCreateNestedManyWithoutVariantInput
     orderDetails?: OrderDetailCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantUncheckedCreateWithoutAnalyticsInput = {
@@ -25785,6 +25971,7 @@ export namespace Prisma {
     cartItems?: CartItemUncheckedCreateNestedManyWithoutVariantInput
     orderDetails?: OrderDetailUncheckedCreateNestedManyWithoutVariantInput
     wishlistItems?: WishlistItemUncheckedCreateNestedManyWithoutVariantInput
+    fittingRequests?: FittingRoomRequestUncheckedCreateNestedManyWithoutVariantInput
   }
 
   export type ProductVariantCreateOrConnectWithoutAnalyticsInput = {
@@ -25880,6 +26067,7 @@ export namespace Prisma {
     cartItems?: CartItemUpdateManyWithoutVariantNestedInput
     orderDetails?: OrderDetailUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutAnalyticsInput = {
@@ -25891,6 +26079,7 @@ export namespace Prisma {
     cartItems?: CartItemUncheckedUpdateManyWithoutVariantNestedInput
     orderDetails?: OrderDetailUncheckedUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUncheckedUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type UserUpsertWithoutAnalyticsInput = {
@@ -26003,7 +26192,7 @@ export namespace Prisma {
 
   export type FittingCartCreateManyStoreInput = {
     fitting_cart_id?: string
-    user_id: string
+    user_id?: string | null
     created_at?: Date | string
     expires_at: Date | string
   }
@@ -26027,9 +26216,9 @@ export namespace Prisma {
   export type FittingRoomRequestCreateManyStoreInput = {
     request_id?: string
     fitting_cart_id: string
-    user_id: string
+    user_id?: string | null
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
+    variant_id: string
     status?: $Enums.RequestStatus
     created_at?: Date | string
   }
@@ -26136,13 +26325,13 @@ export namespace Prisma {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutFittingCartsNestedInput
+    user?: UserUpdateOneWithoutFittingCartsNestedInput
     requests?: FittingRoomRequestUpdateManyWithoutFittingCartNestedInput
   }
 
   export type FittingCartUncheckedUpdateWithoutStoreInput = {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
     requests?: FittingRoomRequestUncheckedUpdateManyWithoutFittingCartNestedInput
@@ -26150,7 +26339,7 @@ export namespace Prisma {
 
   export type FittingCartUncheckedUpdateManyWithoutStoreInput = {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     expires_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26208,19 +26397,19 @@ export namespace Prisma {
   export type FittingRoomRequestUpdateWithoutStoreInput = {
     request_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     fittingCart?: FittingCartUpdateOneRequiredWithoutRequestsNestedInput
-    user?: UserUpdateOneRequiredWithoutFittingRequestsNestedInput
+    user?: UserUpdateOneWithoutFittingRequestsNestedInput
+    variant?: ProductVariantUpdateOneRequiredWithoutFittingRequestsNestedInput
   }
 
   export type FittingRoomRequestUncheckedUpdateWithoutStoreInput = {
     request_id?: StringFieldUpdateOperationsInput | string
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
+    variant_id?: StringFieldUpdateOperationsInput | string
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26228,9 +26417,9 @@ export namespace Prisma {
   export type FittingRoomRequestUncheckedUpdateManyWithoutStoreInput = {
     request_id?: StringFieldUpdateOperationsInput | string
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
+    variant_id?: StringFieldUpdateOperationsInput | string
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26276,7 +26465,7 @@ export namespace Prisma {
     fitting_cart_id: string
     store_id: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
+    variant_id: string
     status?: $Enums.RequestStatus
     created_at?: Date | string
   }
@@ -26400,11 +26589,11 @@ export namespace Prisma {
   export type FittingRoomRequestUpdateWithoutUserInput = {
     request_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     fittingCart?: FittingCartUpdateOneRequiredWithoutRequestsNestedInput
     store?: StoreUpdateOneRequiredWithoutFittingRequestsNestedInput
+    variant?: ProductVariantUpdateOneRequiredWithoutFittingRequestsNestedInput
   }
 
   export type FittingRoomRequestUncheckedUpdateWithoutUserInput = {
@@ -26412,7 +26601,7 @@ export namespace Prisma {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
     store_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
+    variant_id?: StringFieldUpdateOperationsInput | string
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26422,7 +26611,7 @@ export namespace Prisma {
     fitting_cart_id?: StringFieldUpdateOperationsInput | string
     store_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
+    variant_id?: StringFieldUpdateOperationsInput | string
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -26451,6 +26640,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateWithoutProductInput = {
@@ -26462,6 +26652,7 @@ export namespace Prisma {
     orderDetails?: OrderDetailUncheckedUpdateManyWithoutVariantNestedInput
     wishlistItems?: WishlistItemUncheckedUpdateManyWithoutVariantNestedInput
     analytics?: AnalyticsUncheckedUpdateManyWithoutVariantNestedInput
+    fittingRequests?: FittingRoomRequestUncheckedUpdateManyWithoutVariantNestedInput
   }
 
   export type ProductVariantUncheckedUpdateManyWithoutProductInput = {
@@ -26532,6 +26723,16 @@ export namespace Prisma {
     store_id?: string | null
     timestamp?: Date | string
     weight?: number | null
+  }
+
+  export type FittingRoomRequestCreateManyVariantInput = {
+    request_id?: string
+    fitting_cart_id: string
+    user_id?: string | null
+    store_id: string
+    fitting_room_id: string
+    status?: $Enums.RequestStatus
+    created_at?: Date | string
   }
 
   export type InventoryUpdateWithoutVariantInput = {
@@ -26645,6 +26846,36 @@ export namespace Prisma {
     weight?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
+  export type FittingRoomRequestUpdateWithoutVariantInput = {
+    request_id?: StringFieldUpdateOperationsInput | string
+    fitting_room_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    fittingCart?: FittingCartUpdateOneRequiredWithoutRequestsNestedInput
+    user?: UserUpdateOneWithoutFittingRequestsNestedInput
+    store?: StoreUpdateOneRequiredWithoutFittingRequestsNestedInput
+  }
+
+  export type FittingRoomRequestUncheckedUpdateWithoutVariantInput = {
+    request_id?: StringFieldUpdateOperationsInput | string
+    fitting_cart_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
+    store_id?: StringFieldUpdateOperationsInput | string
+    fitting_room_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FittingRoomRequestUncheckedUpdateManyWithoutVariantInput = {
+    request_id?: StringFieldUpdateOperationsInput | string
+    fitting_cart_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
+    store_id?: StringFieldUpdateOperationsInput | string
+    fitting_room_id?: StringFieldUpdateOperationsInput | string
+    status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type CartItemCreateManyCartInput = {
     cart_item_id?: string
     variant_id: string
@@ -26675,10 +26906,10 @@ export namespace Prisma {
 
   export type FittingRoomRequestCreateManyFittingCartInput = {
     request_id?: string
-    user_id: string
+    user_id?: string | null
     store_id: string
     fitting_room_id: string
-    requested_items: JsonNullValueInput | InputJsonValue
+    variant_id: string
     status?: $Enums.RequestStatus
     created_at?: Date | string
   }
@@ -26686,29 +26917,29 @@ export namespace Prisma {
   export type FittingRoomRequestUpdateWithoutFittingCartInput = {
     request_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutFittingRequestsNestedInput
+    user?: UserUpdateOneWithoutFittingRequestsNestedInput
     store?: StoreUpdateOneRequiredWithoutFittingRequestsNestedInput
+    variant?: ProductVariantUpdateOneRequiredWithoutFittingRequestsNestedInput
   }
 
   export type FittingRoomRequestUncheckedUpdateWithoutFittingCartInput = {
     request_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
+    variant_id?: StringFieldUpdateOperationsInput | string
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FittingRoomRequestUncheckedUpdateManyWithoutFittingCartInput = {
     request_id?: StringFieldUpdateOperationsInput | string
-    user_id?: StringFieldUpdateOperationsInput | string
+    user_id?: NullableStringFieldUpdateOperationsInput | string | null
     store_id?: StringFieldUpdateOperationsInput | string
     fitting_room_id?: StringFieldUpdateOperationsInput | string
-    requested_items?: JsonNullValueInput | InputJsonValue
+    variant_id?: StringFieldUpdateOperationsInput | string
     status?: EnumRequestStatusFieldUpdateOperationsInput | $Enums.RequestStatus
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }

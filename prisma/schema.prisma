@@ -65,12 +65,13 @@ model ProductVariant {
   size       String
   color      String
 
-  product       Product        @relation(fields: [product_id], references: [product_id])
-  inventory     Inventory[]
-  cartItems     CartItem[]
-  orderDetails  OrderDetail[]
-  wishlistItems WishlistItem[]
-  analytics     Analytics[]
+  product         Product              @relation(fields: [product_id], references: [product_id])
+  inventory       Inventory[]
+  cartItems       CartItem[]
+  orderDetails    OrderDetail[]
+  wishlistItems   WishlistItem[]
+  analytics       Analytics[]
+  fittingRequests FittingRoomRequest[] @relation("VariantRequests")
 }
 
 model Inventory {
@@ -89,12 +90,12 @@ model Inventory {
 
 model VirtualCart {
   cart_id    String   @id @default(uuid())
-  user_id    String?  // optional user - allows creation of cart for guest
+  user_id    String? // optional user - allows creation of cart for guest
   store_id   String
   created_at DateTime @default(now())
   expires_at DateTime
 
-  user  User?       @relation(fields: [user_id], references: [user_id])
+  user  User?      @relation(fields: [user_id], references: [user_id])
   store Store      @relation(fields: [store_id], references: [store_id])
   items CartItem[]
 }
@@ -112,12 +113,12 @@ model CartItem {
 
 model FittingCart {
   fitting_cart_id String   @id @default(uuid())
-  user_id         String
+  user_id         String?
   store_id        String
   created_at      DateTime @default(now())
   expires_at      DateTime
 
-  user     User                 @relation(fields: [user_id], references: [user_id])
+  user     User?                @relation(fields: [user_id], references: [user_id])
   store    Store                @relation(fields: [store_id], references: [store_id])
   requests FittingRoomRequest[]
 }
@@ -125,16 +126,17 @@ model FittingCart {
 model FittingRoomRequest {
   request_id      String        @id @default(uuid())
   fitting_cart_id String
-  user_id         String
+  user_id         String?
   store_id        String
   fitting_room_id String
-  requested_items Json
+  variant_id      String
   status          RequestStatus @default(pending)
   created_at      DateTime      @default(now())
 
-  fittingCart FittingCart @relation(fields: [fitting_cart_id], references: [fitting_cart_id])
-  user        User        @relation(fields: [user_id], references: [user_id])
-  store       Store       @relation(fields: [store_id], references: [store_id])
+  fittingCart FittingCart    @relation(fields: [fitting_cart_id], references: [fitting_cart_id])
+  user        User?          @relation(fields: [user_id], references: [user_id])
+  store       Store          @relation(fields: [store_id], references: [store_id])
+  variant     ProductVariant @relation("VariantRequests", fields: [variant_id], references: [variant_id])
 }
 
 model Order {
@@ -209,6 +211,7 @@ enum StockStatus {
 enum RequestStatus {
   pending
   fulfilled
+  cancelled
 }
 
 enum OrderStatus {
