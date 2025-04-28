@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       return res.status(405).json({ success: false, error: "Method Not Allowed" });
     }
 
-    // Authenticate
+    // Authenticate Customer / Guest
     let userID: string | null = null;
     const session = await getServerSession(req, res, authOptions);
     if (session?.user?.id && session.user.role === Role.customer) {
@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     let cart;
 
-    // Try to reuse existing cart for signed-in customer
+    // If authenticated customer -> use existing cart + delay expiry time
     if (userID) {
         cart = await prisma.virtualCart.findFirst({
             where: {
@@ -59,15 +59,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         cart = await prisma.virtualCart.create({
             data: {
                 // only connect user if we have one
-                ...(userID 
-                    ? { user: { connect: { user_id: userID } } }
-                    : {}),
+                ...(userID ? { user: { connect: { user_id: userID } } }: {}),
                 store: { connect: { store_id } },
                 expires_at: twoHoursLater,
             },
         });
     }
 
+    // Return cart object 
     return res.status(201).json({
         success: true,
         cart: {
