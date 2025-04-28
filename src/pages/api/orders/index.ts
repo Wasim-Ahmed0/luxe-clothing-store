@@ -47,6 +47,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     if (cart.expires_at < now) {
         return res.status(400).json({ success: false, error: "Cart expired" });
     }
+    
+    // pull store_id out so in scope inside transaction
+     const storeID = cart.store_id;
 
     // Run create-order and delete-cart in one transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -67,6 +70,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 },
             },
         });
+
+        // 4c) decrement inventory for each item
+        for (const item of cart.items) {
+            await tx.inventory.updateMany({
+                where: { store_id: storeID, variant_id: item.variant_id },
+                data:  { quantity: { decrement: item.quantity } },
+              });              
+        }
 
         // this will cascade‐delete its CartItem children
         await tx.virtualCart.delete({ where: { cart_id } });
