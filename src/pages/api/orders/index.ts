@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(405).json({ success: false, error: "Method Not Allowed" });
     }
 
-    // Must be signed in
+    // Must be authenticated
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user?.id) {
         return res.status(401).json({ success: false, error: "Not Authenticated" });
@@ -43,12 +43,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(403).json({ success: false, error: "Forbidden" });
     }
     
+    // Expiry Time Validation Check
     const now = new Date();
     if (cart.expires_at < now) {
         return res.status(400).json({ success: false, error: "Cart expired" });
     }
     
-    // pull store_id out so in scope inside transaction
+    // Keep store_id in scope of database transaction below
      const storeID = cart.store_id;
 
     // Run create-order and delete-cart in one transaction
@@ -71,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             },
         });
 
-        // 4c) decrement inventory for each item
+        // Decrement inventory for each item
         for (const item of cart.items) {
             await tx.inventory.updateMany({
                 where: { store_id: storeID, variant_id: item.variant_id },
@@ -79,13 +80,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
               });              
         }
 
-        // this will cascade‐delete its CartItem children
+        // cascade‐delete its CartItem children
         await tx.virtualCart.delete({ where: { cart_id } });
 
         return order;
   });
 
-    // Return a token (we’ll just use order_id)
+    // Return a token (order_id)
     return res.status(201).json({success: true, order_id: result.order_id, checkoutToken: result.order_id,});
 }
 
