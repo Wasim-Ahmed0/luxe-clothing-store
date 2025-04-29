@@ -33,15 +33,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(403).json({ success: false, error: "Forbidden" });
     }
 
+    // Extract Payload
     const { fitting_room_id, variant_id } = req.body as {
         fitting_room_id?: string;
         variant_id?: string;
     };
     
+    // Validate Payload
     if (!fitting_room_id || !variant_id) {
         return res.status(400).json({ success: false, error: "fitting_room_id & variant_id are required" });
     }
 
+    // Add Try-On Request
     try {
         const fr = await prisma.fittingRoomRequest.create({
             data: {
