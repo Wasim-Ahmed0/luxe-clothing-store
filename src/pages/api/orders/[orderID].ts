@@ -35,13 +35,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     // Auth
     const session = await getServerSession(req, res, authOptions);
 
-    // Validate
+    // Validate Payload
     const { orderID } = req.query;
     if (typeof orderID !== "string") {
         return res.status(400).json({ success: false, error: "Invalid order ID" });
     }
 
-    // Fetch
+    // Fetch order
     const order = await prisma.order.findUnique({
         where: { order_id: orderID },
         include: { details: true },
