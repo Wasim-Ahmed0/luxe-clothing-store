@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         }
     }
     
-    // if ownerId is null → guest cart -> anyone with the cartID may update!!!
+    // if ownerId is null -> guest cart -> anyone with the cartID may update!!!
 
     // Extract payload
     const { quantity } = req.body as { quantity?: number };
