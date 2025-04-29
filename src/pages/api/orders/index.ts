@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 import { prisma } from "../../../../lib/prisma";
-import { OrderDetail } from "@/generated/prisma";
+import { OrderDetail, Role } from "@/generated/prisma";
 
 type SuccessResp = { success: true; order_id: OrderDetail["order_id"]; checkoutToken: OrderDetail["order_id"];};
 type ErrorResp = { success: false; error: string };
@@ -19,6 +19,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(401).json({ success: false, error: "Not Authenticated" });
     }
     
+    // Only customers can place an order
+    if (session.user.role !== Role.customer) {
+        return res.status(403).json({ success: false, error: "Not Authenticated Customer" });
+    }
     
     const userID = session.user.id;
 
