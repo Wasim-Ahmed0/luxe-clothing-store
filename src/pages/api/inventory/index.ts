@@ -31,11 +31,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         // query filters: store_id, product_id, variant_id
         const { store_id, product_id, variant_id } = req.query;
         const filters: any = {};
-    
+        
+        // Add parameters from request query to build filters object
         if (store_id)   filters.store_id   = store_id as string;
         if (product_id) filters.product_id = product_id as string;
         if (variant_id) filters.variant_id = variant_id as string;
-    
+        
+        // Fetch Inventory Records
         try {
             const rows = await prisma.inventory.findMany({
                 where: filters,
@@ -68,11 +70,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             quantity?: number;
             status?: Inventory["status"];
           };
-      
+          
+        // Validate Payload
         if (!store_id || !product_id || !variant_id || typeof quantity !== "number" || !status) {
           return res.status(400).json({ success: false, error: "All fields are required" });
         }
 
+        // Create Inventory Record
         try {
             const created = await prisma.inventory.create({
                 data: {

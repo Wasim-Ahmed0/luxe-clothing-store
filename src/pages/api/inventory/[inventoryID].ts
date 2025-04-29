@@ -54,15 +54,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     // --- PUT to update quantity or status ---
     if (req.method === "PUT") {
+        // Extract Payload
         const { quantity, status } = req.body as {
             quantity?: number;
             status?:   "available" | "unavailable" | "discontinued";
         };
-    
+        
+        // Validate Payload
         if (quantity == null && status == null) {
             return res.status(400).json({ success: false, error: "Provide quantity or status" });
         }
 
+        // Update Inventory Record
         try {
             const updated = await prisma.inventory.update({
                 where: { inventory_id: inventoryID },
