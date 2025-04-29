@@ -84,7 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         await tx.virtualCart.delete({ where: { cart_id } });
 
         return order;
-  });
+    });
 
     // Return a token (order_id)
     return res.status(201).json({success: true, order_id: result.order_id, checkoutToken: result.order_id,});
