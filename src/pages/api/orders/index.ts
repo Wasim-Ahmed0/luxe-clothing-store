@@ -13,16 +13,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(405).json({ success: false, error: "Method Not Allowed" });
     }
 
-    // Must be authenticated
+    // Must be authenticated and a customer
     const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id || session.user.role !== Role.customer) {
         return res.status(401).json({ success: false, error: "Not Authenticated" });
     }
     
-    // Only customers can place an order
-    if (session.user.role !== Role.customer) {
-        return res.status(403).json({ success: false, error: "Not Authenticated Customer" });
-    }
     
     const userID = session.user.id;
 
