@@ -51,6 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         },
     });
 
+    // If existing cart then update, otherwise create
     if (vCart) {
         vCart = await prisma.virtualCart.update({
             where: { cart_id: vCart.cart_id },
