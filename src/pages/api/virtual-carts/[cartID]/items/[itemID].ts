@@ -42,10 +42,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(404).json({ success: false, error: "Item not found" });
     }
 
-    // Auth / owner check
+    // Authentication - determine if guest or customer
     const ownerId = cartItem.cart.user_id;
     if (ownerId) {
-        // only the signed-in owner may update
         const session = await getServerSession(req, res, authOptions);
         if (!session?.user?.id || session.user.id !== ownerId) {
             return res.status(403).json({ success: false, error: "Forbidden" });
