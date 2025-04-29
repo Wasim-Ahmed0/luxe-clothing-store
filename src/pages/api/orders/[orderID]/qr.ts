@@ -1,4 +1,3 @@
-// pages/api/orders/[orderID]/qr.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]";
@@ -30,6 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(405).json({ success: false, error: "Method Not Allowed" });
     }
 
+    // Fetch Session + Extract and Validate Payload
     const session = await getServerSession(req, res, authOptions);
     const { orderID, token } = req.query;
     
@@ -66,6 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(409).json({ success:false, error: "Order not pending" });
     }
 
+    // Validate authenticated user
     const me = session?.user;
     const isOwner = me?.id === order.user_id;
     const isEmployee = me?.role === Role.employee || me?.role === Role.store_manager;
