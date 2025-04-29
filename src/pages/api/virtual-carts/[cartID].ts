@@ -87,6 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             }
         }
         
+        // Return cart and nested product / variant items
         const resp: SuccessResp = {
             success: true,
             cart: {
