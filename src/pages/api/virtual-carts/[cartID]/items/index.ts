@@ -40,13 +40,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             return res.status(403).json({ success: false, error: "Forbidden" });
         }
 
-        // Extract + validate payload
+        // Extract payload
         const { variant_id, quantity } = req.body as {
             variant_id?: string;
             quantity?: number;
         };
 
-
+        // Validate payload
         if (!variant_id || !quantity || quantity < 1) {
             return res.status(400).json({ success: false, error: "variant_id & quantity>=1 required" });
         }
@@ -125,11 +125,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             return res.status(500).json({ success: false, error: "Failed to delete item" });
     }
   }
-
-    
-    
-    
-    
-
-    
 }
