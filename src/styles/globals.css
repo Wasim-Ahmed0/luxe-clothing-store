@@ -19,8 +19,77 @@
   }
 }
 
+html, body, #__next {
+  min-height: 100%;
+  position: relative;
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+footer {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 0;
+}
+
+/* Smooth scrolling with native CSS */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Transition styles */
+.section-transition {
+  position: relative;
+  z-index: 1;
+}
+
+/* Prevent FOUC (Flash of Unstyled Content) during transitions */
+.gsap-transition {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* GSAP Pin spacer styling */
+.pin-spacer {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Next.js Image component in animation context */
+span[style*="box-sizing: border-box; display: block; overflow: hidden;"] {
+  width: 100% !important;
+  height: 100% !important;
+  contain: paint; /* Improve paint performance */
+}
+
+span[style*="box-sizing: border-box; display: block; overflow: hidden;"] > img {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+  will-change: transform; /* Optimize for animations */
+  backface-visibility: hidden; /* Prevent flickering */
+}
+
+/* Heritage content class for targeting fade animations */
+.heritage-content {
+  will-change: opacity;
+  backface-visibility: hidden; /* Prevent flickering */
+}
+
+/* Performance optimisations for animations */
+.transform-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
