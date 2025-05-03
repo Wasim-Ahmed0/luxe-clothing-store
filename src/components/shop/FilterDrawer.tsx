@@ -58,9 +58,7 @@ export default function FilterDrawer({
       {/* Blurred backdrop */}
       <div
         onClick={onClose}
-        className={`absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300 ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={"absolute inset-0 bg-black opacity-70 backdrop-blur-sm transition-opacity duration-300"}
       />
 
       {/* Drawer panel */}
@@ -164,7 +162,7 @@ export default function FilterDrawer({
                     <div>
                       <label className="block text-sm text-stone-900 mb-1">Min</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-900">$</span>
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-900">£</span>
                         <input
                           type="number"
                           value={localMin}
@@ -172,7 +170,7 @@ export default function FilterDrawer({
                           max={localMax}
                           onChange={(e) => setLocalMin(Number(e.target.value))}
                           onBlur={handlePriceChange}
-                          className="pl-8 pr-3 py-2 border border-stone-300 rounded w-24 focus:outline-none focus:ring-amber-800 focus:border-amber-800"
+                          className="pl-8 pr-3 py-2 text-stone-900 border border-stone-300 rounded w-24 focus:outline-none focus:ring-amber-800 focus:border-amber-800"
                         />
                       </div>
                     </div>
@@ -183,7 +181,7 @@ export default function FilterDrawer({
                     <div>
                       <label className="block text-sm text-stone-900 mb-1">Max</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-900">$</span>
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-900">£</span>
                         <input
                           type="number"
                           value={localMax}
@@ -191,7 +189,7 @@ export default function FilterDrawer({
                           max={maxPrice}
                           onChange={(e) => setLocalMax(Number(e.target.value))}
                           onBlur={handlePriceChange}
-                          className="pl-8 pr-3 py-2 border border-stone-300 rounded w-24 focus:outline-none focus:ring-amber-800 focus:border-amber-800"
+                          className="pl-8 pr-3 py-2 text-stone-900 border border-stone-300 rounded w-24 focus:outline-none focus:ring-amber-800 focus:border-amber-800"
                         />
                       </div>
                     </div>
