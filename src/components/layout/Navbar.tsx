@@ -66,8 +66,8 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             {/* Navigation Items with hover effects */}
             <NavItem href="/shop" label="SHOP" />
-            <NavItem href="/about" label="ABOUT" />
-            <NavItem href="/contact" label="CONTACT" />
+            <NavItem href="/" label="ABOUT" />
+            <NavItem href="/" label="CONTACT" />
           </div>
 
           {/* Action Icons */}
@@ -94,10 +94,10 @@ export default function Navbar() {
           <Link href="/shop" className="text-2xl tracking-wider text-stone-900" onClick={() => setIsMenuOpen(false)}>
             SHOP
           </Link>
-          <Link href="/about" className="text-2xl tracking-wider text-stone-900" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/" className="text-2xl tracking-wider text-stone-900" onClick={() => setIsMenuOpen(false)}>
             ABOUT
           </Link>
-          <Link href="/contact" className="text-2xl tracking-wider text-stone-900" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/" className="text-2xl tracking-wider text-stone-900" onClick={() => setIsMenuOpen(false)}>
             CONTACT
           </Link>
         </div>

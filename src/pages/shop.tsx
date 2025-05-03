@@ -22,40 +22,67 @@ interface FilterState {
   sort: SortOption
 }
 
-const dummyResponse: { success: true; products: Product[] } = {
-  success: true,
-  products: Array(12).fill({
-    product_id: "1",
-    name: "Savile Row Signature Suit",
-    description: "Two-piece wool suit with peak lapels.",
-    price: 799.99,
-    category: "Suits",
-  }),
-}
-
 export default function ShopPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
-    priceRange: [0, 2000],
+    priceRange: [0, 0],
     sort: "default",
   })
-
-  const categories = ["Suits", "Outerwear", "Shirts", "Footwear", "Accessories"]
+  const [allCategories, setAllCategories] = useState<string[]>([])
+  const [priceBounds, setPriceBounds] = useState<[number, number]>([0, 0])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
     price: true,
   })
 
   useEffect(() => {
-    setProducts(dummyResponse.products)
+    async function fetchProducts() {
+      setLoading(true)
+      setError(null)
+      try {
+        const res = await fetch('/api/products')
+        const data = await res.json()
+        if (data.success && Array.isArray(data.products)) {
+          const fetched = data.products as Product[]
+          setProducts(fetched)
+
+          // derive unique categories
+          const cats = Array.from(new Set(fetched.map((p) => p.category)))
+          setAllCategories(cats)
+
+          // derive price bounds
+          const prices = fetched.map((p) => p.price)
+          const minPrice = Math.min(...prices)
+          const maxPrice = Math.max(...prices)
+          setPriceBounds([minPrice, maxPrice])
+
+          // initialize filters
+          setFilters((prev) => ({
+            ...prev,
+            categories: [],
+            priceRange: [minPrice, maxPrice],
+          }))
+        } else {
+          setError('Failed to load products')
+        }
+      } catch {
+        setError('An error occurred while fetching products')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProducts()
   }, [])
 
   const filteredProducts = products
     .filter((p) => {
       if (filters.categories.length && !filters.categories.includes(p.category)) return false
-      if (p.price < filters.priceRange[0] || p.price > filters.priceRange[1]) return false
+      const [min, max] = filters.priceRange
+      if (p.price < min || p.price > max) return false
       return true
     })
     .sort((a, b) => {
@@ -87,12 +114,17 @@ export default function ShopPage() {
             </button>
           </div>
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product, i) => (
-              <ProductCard key={`${product.product_id}-${i}`} product={product} />
-            ))}
-          </div>
+          {loading ? (
+            <p className="text-center text-stone-500">Loading products...</p>
+          ) : error ? (
+            <p className="text-center text-red-600">{error}</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredProducts.map((product, i) => (
+                <ProductCard key={`${product.product_id}-${i}`} product={product} />
+              ))}
+            </div>
+          )}
         </div>
       </main>
 
@@ -100,21 +132,23 @@ export default function ShopPage() {
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         filters={filters}
-        categories={categories}
+        categories={allCategories}
         expandedSections={expandedSections}
-        toggleSection={(s) =>
-          setExpandedSections((prev) => ({ ...prev, [s]: !prev[s] }))
+        toggleSection={(section) =>
+          setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }))
         }
-        toggleCategory={(c) =>
+        toggleCategory={(category) =>
           setFilters((f) => ({
             ...f,
-            categories: f.categories.includes(c)
-              ? f.categories.filter((x) => x !== c)
-              : [...f.categories, c],
+            categories: f.categories.includes(category)
+              ? f.categories.filter((x) => x !== category)
+              : [...f.categories, category],
           }))
         }
-        updatePriceRange={(r) => setFilters((f) => ({ ...f, priceRange: r }))}
-        updateSort={(s) => setFilters((f) => ({ ...f, sort: s }))}
+        updatePriceRange={(range) => setFilters((f) => ({ ...f, priceRange: range }))}
+        updateSort={(sort) => setFilters((f) => ({ ...f, sort }))}
+        minPrice={priceBounds[0]}
+        maxPrice={priceBounds[1]}
       />
 
       <Footer />

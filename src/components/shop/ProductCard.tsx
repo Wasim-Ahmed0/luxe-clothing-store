@@ -55,7 +55,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <div>
           <h3 className="text-lg font-light text-stone-900">{product.name}</h3>
           <p className="text-sm text-stone-500 mb-1">{product.category}</p>
-          <p className="text-amber-800">${product.price.toFixed(2)}</p>
+          <p className="text-amber-800">£{product.price.toFixed(2)}</p>
         </div>
       </div>
     </Link>

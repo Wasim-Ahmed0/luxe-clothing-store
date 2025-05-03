@@ -3,10 +3,25 @@ import { Slider } from "@/components/ui/Slider"
 import { ChevronDown, ChevronUp, X } from "lucide-react"
 
 type SortOption = "default" | "price-asc" | "price-desc"
+
 interface FilterState {
   categories: string[]
   priceRange: [number, number]
   sort: SortOption
+}
+
+interface FilterDrawerProps {
+  isOpen: boolean
+  onClose: () => void
+  filters: FilterState
+  categories: string[]
+  expandedSections: { categories: boolean; price: boolean }
+  toggleSection: (section: "categories" | "price") => void
+  toggleCategory: (category: string) => void
+  updatePriceRange: (range: [number, number]) => void
+  updateSort: (sort: SortOption) => void
+  minPrice: number
+  maxPrice: number
 }
 
 export default function FilterDrawer({
@@ -19,27 +34,19 @@ export default function FilterDrawer({
   toggleCategory,
   updatePriceRange,
   updateSort,
-}: {
-  isOpen: boolean
-  onClose: () => void
-  filters: FilterState
-  categories: string[]
-  expandedSections: { categories: boolean; price: boolean }
-  toggleSection: (section: "categories" | "price") => void
-  toggleCategory: (category: string) => void
-  updatePriceRange: (range: [number, number]) => void
-  updateSort: (sort: SortOption) => void
-}) {
-  const [minPrice, setMinPrice] = useState(filters.priceRange[0])
-  const [maxPrice, setMaxPrice] = useState(filters.priceRange[1])
+  minPrice,
+  maxPrice,
+}: FilterDrawerProps) {
+  const [localMin, setLocalMin] = useState(filters.priceRange[0])
+  const [localMax, setLocalMax] = useState(filters.priceRange[1])
 
   useEffect(() => {
-    setMinPrice(filters.priceRange[0])
-    setMaxPrice(filters.priceRange[1])
+    setLocalMin(filters.priceRange[0])
+    setLocalMax(filters.priceRange[1])
   }, [filters.priceRange])
 
   const handlePriceChange = () => {
-    updatePriceRange([minPrice, maxPrice])
+    updatePriceRange([localMin, localMax])
   }
 
   return (
@@ -50,20 +57,22 @@ export default function FilterDrawer({
     >
       {/* Blurred backdrop */}
       <div
-        className={"absolute inset-0 bg-black opacity-70 backdrop-blur-sm transition-opacity duration-300"}
         onClick={onClose}
+        className={`absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity duration-300 ${
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
       />
 
       {/* Drawer panel */}
       <div
-        className={`border-l-2 border-black relative w-full max-w-md bg-white bg-opacity-90 h-full transform transition-transform duration-300 ${
+        className={`relative w-full max-w-md h-full bg-white bg-opacity-90 border-l border-stone-200 transform transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="h-full flex flex-col overflow-hidden">
           {/* Header */}
           <div className="flex justify-between items-center p-6 border-b border-stone-200">
-            <h2 className="text-xl font-light text-stone-900">Filter &amp; Sort</h2>
+            <h2 className="text-xl font-light text-stone-900">Filter & Sort</h2>
             <button onClick={onClose} className="text-stone-500 hover:text-stone-700">
               <X size={20} />
             </button>
@@ -71,15 +80,12 @@ export default function FilterDrawer({
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6">
-            {/* Sort By */}
+            {/* Sort */}
             <div className="mb-8">
               <h3 className="text-lg font-medium text-stone-900 mb-4">Sort By</h3>
               <div className="space-y-2">
                 {(["default", "price-asc", "price-desc"] as SortOption[]).map((opt) => (
-                  <label
-                    key={opt}
-                    className="flex items-center text-stone-900"
-                  >
+                  <label key={opt} className="flex items-center text-stone-900">
                     <input
                       type="radio"
                       name="sort"
@@ -87,11 +93,7 @@ export default function FilterDrawer({
                       onChange={() => updateSort(opt)}
                       className="mr-2 text-amber-800 focus:ring-amber-800"
                     />
-                    {{
-                      default: "Default",
-                      "price-asc": "Price Low → High",
-                      "price-desc": "Price High → Low",
-                    }[opt]}
+                    {{ default: "Default", "price-asc": "Price ↑", "price-desc": "Price ↓" }[opt]}
                   </label>
                 ))}
               </div>
@@ -114,10 +116,7 @@ export default function FilterDrawer({
               {expandedSections.categories && (
                 <div className="space-y-2">
                   {categories.map((cat) => (
-                    <label
-                      key={cat}
-                      className="flex items-center text-stone-900"
-                    >
+                    <label key={cat} className="flex items-center text-stone-900">
                       <input
                         type="checkbox"
                         checked={filters.categories.includes(cat)}
@@ -148,46 +147,51 @@ export default function FilterDrawer({
               {expandedSections.price && (
                 <div className="space-y-6">
                   <Slider
-                    defaultValue={[minPrice, maxPrice]}
-                    min={0}
-                    max={2000}
-                    step={10}
-                    value={[minPrice, maxPrice]}
-                    onValueChange={(val) => {
-                      setMinPrice(val[0])
-                      setMaxPrice(val[1])
+                    value={[localMin, localMax]}
+                    min={minPrice}
+                    max={maxPrice}
+                    step={1}
+                    onValueChange={([min, max]) => {
+                      setLocalMin(min)
+                      setLocalMax(max)
                     }}
                     onValueCommit={handlePriceChange}
                     className="mt-6"
                   />
 
                   <div className="flex items-center justify-between">
-                    {/* Min */}
+                    {/* Min input */}
                     <div>
                       <label className="block text-sm text-stone-900 mb-1">Min</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-900">£</span>
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-900">$</span>
                         <input
                           type="number"
-                          value={minPrice}
-                          onChange={(e) => setMinPrice(Number(e.target.value))}
+                          value={localMin}
+                          min={minPrice}
+                          max={localMax}
+                          onChange={(e) => setLocalMin(Number(e.target.value))}
                           onBlur={handlePriceChange}
-                          className="pl-8 pr-3 py-2 border border-stone-300 rounded w-24 focus:outline-none focus:ring-1 focus:ring-amber-800 focus:border-amber-800"
+                          className="pl-8 pr-3 py-2 border border-stone-300 rounded w-24 focus:outline-none focus:ring-amber-800 focus:border-amber-800"
                         />
                       </div>
                     </div>
+
                     <div className="text-stone-900 mx-2">to</div>
-                    {/* Max */}
+
+                    {/* Max input */}
                     <div>
                       <label className="block text-sm text-stone-900 mb-1">Max</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-900">£</span>
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-stone-900">$</span>
                         <input
                           type="number"
-                          value={maxPrice}
-                          onChange={(e) => setMaxPrice(Number(e.target.value))}
+                          value={localMax}
+                          min={localMin}
+                          max={maxPrice}
+                          onChange={(e) => setLocalMax(Number(e.target.value))}
                           onBlur={handlePriceChange}
-                          className="pl-8 pr-3 py-2 border border-stone-300 rounded w-24 focus:outline-none focus:ring-1 focus:ring-amber-800 focus:border-amber-800"
+                          className="pl-8 pr-3 py-2 border border-stone-300 rounded w-24 focus:outline-none focus:ring-amber-800 focus:border-amber-800"
                         />
                       </div>
                     </div>
