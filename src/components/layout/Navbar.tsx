@@ -66,7 +66,6 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             {/* Navigation Items with hover effects */}
             <NavItem href="/shop" label="SHOP" />
-            <NavItem href="/collections" label="COLLECTIONS" />
             <NavItem href="/about" label="ABOUT" />
             <NavItem href="/contact" label="CONTACT" />
           </div>
@@ -94,13 +93,6 @@ export default function Navbar() {
         <div className="flex flex-col items-center justify-center h-full space-y-8">
           <Link href="/shop" className="text-2xl tracking-wider text-stone-900" onClick={() => setIsMenuOpen(false)}>
             SHOP
-          </Link>
-          <Link
-            href="/collections"
-            className="text-2xl tracking-wider text-stone-900"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            COLLECTIONS
           </Link>
           <Link href="/about" className="text-2xl tracking-wider text-stone-900" onClick={() => setIsMenuOpen(false)}>
             ABOUT
