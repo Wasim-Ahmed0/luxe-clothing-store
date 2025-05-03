@@ -1,41 +1,42 @@
-import { useState } from "react";
-import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import { Heart, Truck } from "lucide-react";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import { useState } from "react"
+import Head from "next/head"
+import Image from "next/image"
+import Link from "next/link"
+import { GetServerSideProps } from "next"
+import { Heart, Truck } from "lucide-react"
+import Navbar from "@/components/layout/Navbar"
+import Footer from "@/components/layout/Footer"
+import suitImg from "../../../public/images/Savile Row Suit.png" // placeholder image
 
-import suitImg from "../../../public/images/Savile Row Suit.png";
-
-// Dummy product data
-const dummyProduct = {
-  success: true,
-  product: {
-    product_id: "1",
-    name: "Savile Row Signature Suit",
-    description:
-      "Two-piece wool suit with peak lapels and a tailored modern fit, crafted in 100% Merino wool. Features a single-breasted jacket with two-button closure, flap pockets, and a notched lapel. Trousers have a flat front with side pockets and are slightly tapered for a contemporary silhouette. Fully lined with LUXE signature jacquard lining and hand-finished details throughout.",
-    price: 799.99,
-    category: "Suits",
-    variants: [
-      { variant_id: "1-s-black", size: "S", color: "Black", in_stock: true },
-      { variant_id: "1-m-black", size: "M", color: "Black", in_stock: true },
-      { variant_id: "1-l-black", size: "L", color: "Black", in_stock: true },
-      { variant_id: "1-xl-black", size: "XL", color: "Black", in_stock: true },
-    ],
-  },
+interface Variant {
+  variant_id: string
+  size: string
+  color: string
+  in_stock: boolean
 }
 
-export default function ProductDetail() {
+interface Product {
+  product_id: string
+  name: string
+  description: string
+  price: number
+  category: string
+  variants: Variant[]
+}
+
+interface ProductDetailProps {
+  product: Product
+}
+
+export default function ProductDetail({ product }: ProductDetailProps) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null)
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
-  // simulate presence of a store for the second button
-  const hasStore = true
+  
+  const hasStore = false
 
-  const { product } = dummyProduct
+  // derive colors and sizes
   const colors = Array.from(new Set(product.variants.map((v) => v.color)))
-  const sizes  = Array.from(new Set(product.variants.map((v) => v.size)))
+  const sizes = Array.from(new Set(product.variants.map((v) => v.size)))
   const isComplete = !!selectedColor && !!selectedSize
 
   const handleAddToCart = () => {
@@ -44,12 +45,13 @@ export default function ProductDetail() {
       (v) => v.color === selectedColor && v.size === selectedSize
     )
     console.log("Adding to cart:", variant)
+    // add cart logic here
   }
 
   return (
     <>
       <Head>
-        <title>{product.name} | LUXE</title>
+        <title>{`${product.name} | LUXE`}</title>
         <meta name="description" content={product.description.slice(0, 160)} />
       </Head>
 
@@ -82,7 +84,7 @@ export default function ProductDetail() {
             <div className="lg:w-3/5">
               <div className="aspect-[4/5] bg-stone-200 relative">
                 <Image
-                  src={ suitImg }
+                  src={suitImg}
                   alt={product.name}
                   fill
                   className="object-cover"
@@ -115,27 +117,30 @@ export default function ProductDetail() {
                   COLOR: {selectedColor ?? "Select a color"}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {colors.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => setSelectedColor(c)}
-                      className={`w-10 h-10 rounded-full border ${
-                        selectedColor === c
-                          ? "border-amber-800 ring-2 ring-amber-800"
-                          : "border-stone-300"
-                      }`}
-                      style={{ backgroundColor: c.toLowerCase() }}
-                      aria-label={`Select ${c}`}
-                    />
-                  ))}
+                  {colors.map((c) => {
+                    const lower = c.toLowerCase()
+                    return (
+                      <button
+                        key={c}
+                        onClick={() => setSelectedColor(c)}
+                        className={`w-10 h-10 rounded-full border border-stone-300 transition-shadow focus:outline-none
+                          ${selectedColor === c
+                            ? 'shadow-[inset_0_0_0_2px_white,0_0_0_2px_black]'
+                            : ''}
+                          hover:shadow-[inset_0_0_0_2px_white,0_0_0_2px_black]`}
+                        style={{ backgroundColor: lower }}
+                        aria-label={`Select ${c}`}
+                      />
+                    )
+                  })}
                 </div>
               </div>
 
               {/* Sizes */}
               <div className="mb-8">
-                  <p className="text-sm font-medium text-stone-900">
-                    SIZE: {selectedSize ?? "Select a size"}
-                  </p>
+                <p className="text-sm font-medium text-stone-900 mb-2">
+                  SIZE: {selectedSize ?? "Select a size"}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {sizes.map((s) => (
                     <button
@@ -162,8 +167,7 @@ export default function ProductDetail() {
                     isComplete
                       ? "bg-stone-900 hover:bg-stone-800"
                       : "bg-stone-400 cursor-not-allowed"
-                  }`}
-                >
+                  }`}>
                   ADD TO CART
                 </button>
                 {hasStore && (
@@ -174,8 +178,7 @@ export default function ProductDetail() {
                       isComplete
                         ? "bg-amber-800 hover:bg-amber-700"
                         : "bg-stone-400 cursor-not-allowed"
-                    }`}
-                  >
+                    }`}>
                     ADD TO FITTING ROOM
                   </button>
                 )}
@@ -196,28 +199,9 @@ export default function ProductDetail() {
             </h2>
             <div className="max-w-none text-stone-700">
               <p>
-                The Savile Row Signature Suit embodies the pinnacle of LUXE craftsmanship and
-                timeless elegance. Each suit is meticulously tailored by our master craftsmen
-                using traditional techniques passed down through generations.
+                The {product.name} embodies the pinnacle of LUXE craftsmanship and timeless elegance.
               </p>
-              <h3>Materials</h3>
-              <ul>
-                <li>100% premium Merino wool (Super 120s)</li>
-                <li>Sourced from the finest mills in Italy</li>
-                <li>Luxurious jacquard lining with LUXE monogram</li>
-                <li>Horn buttons with subtle LUXE engraving</li>
-              </ul>
-              <h3>Features</h3>
-              <ul>
-                <li>Tailored fit with natural shoulder line</li>
-                <li>Peak lapels with hand-rolled edges</li>
-                <li>Two-button single‑breasted closure</li>
-                <li>Double‑vented back for ease of movement</li>
-                <li>Four interior pockets with secure closures</li>
-                <li>Flat‑front trousers with side adjusters</li>
-              </ul>
-              <h3>Care Instructions</h3>
-              <p>Dry clean only. We recommend professional cleaning by a specialist in fine tailoring.</p>
+              {/* ... you can keep static extended details or fetch more if needed */}
             </div>
           </div>
         </div>
@@ -226,4 +210,23 @@ export default function ProductDetail() {
       <Footer />
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ params, req }) => {
+  const productID = params?.productID as string
+  const host = req.headers.host
+  const protocol = host?.includes("localhost") ? "http" : "https"
+  const res = await fetch(
+    `${protocol}://${host}/api/products/${productID}`
+  )
+  if (!res.ok) {
+    return { notFound: true }
+  }
+  const data = await res.json()
+  if (!data.success) {
+    return { notFound: true }
+  }
+  return {
+    props: { product: data.product },
+  }
 }
