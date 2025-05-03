@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma'
-import { Role } from '@/generated/prisma';
+import { Role } from '../src/generated/prisma'
 import argon2 from 'argon2';
 
 async function main() {
@@ -8,7 +8,6 @@ async function main() {
     data: {
       store_name: 'Luxe London',
       location: '123 Savile Row, London',
-      area_code: ['A1', 'B2', 'C3'],
     },
   });
 
@@ -16,7 +15,6 @@ async function main() {
     data: {
       store_name: 'Luxe Manchester',
       location: '1 King Street, Manchester',
-      area_code: ['D1', 'E2', 'F3'],
     },
   });
 
@@ -24,9 +22,16 @@ async function main() {
     data: {
       store_name: 'Luxe Edinburgh',
       location: '45 George Street, Edinburgh',
-      area_code: ['G1', 'H2', 'I3'],
     },
+  
   });
+
+  const storeOnline = await prisma.store.create({
+    data: {
+      store_name: 'Luxe Online',
+      location: 'luxe london',
+    },
+  })
 
   // 2. Hash a default password for all test users
   const defaultPlain = 'password';
@@ -91,7 +96,7 @@ async function main() {
 
   // 5. Seed Inventory for each variant in all stores
   for (const variant of variants) {
-    for (const store of [storeLondon, storeManchester, storeEdinburgh]) {
+    for (const store of [storeLondon, storeManchester, storeEdinburgh, storeOnline]) {
       const qty = Math.floor(Math.random() * 20) + 1;
       await prisma.inventory.create({
         data: {

@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     }
 
     const session = await getServerSession(req, res, authOptions);
-    if (!session?.user?.id || session.user.role !== Role.customer) {
+    if (!session?.user?.id) {
         return res.status(403).json({ success: false, error: "Forbidden" });
     }
 
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     let wishlist = await prisma.wishlist.findFirst({ where: { user_id: session.user.id } });
     if (!wishlist) {
         wishlist = await prisma.wishlist.create({
-            data: { user: { connect: { user_id: session.user.id } } }
+            data: { user_id: session.user.id }
         });
     }
 
@@ -50,8 +50,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     // add item
     const wi = await prisma.wishlistItem.create({
         data: {
-            wishlist: { connect: { wishlist_id: wishlist.wishlist_id } },
-            variant:  { connect: { variant_id } }
+            wishlist_id: wishlist.wishlist_id,
+            variant_id,
         }
     });
 

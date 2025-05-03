@@ -1,7 +1,9 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, ShoppingBag, User, Search } from "lucide-react";
+import { useCart } from "@/context/cart-context"
+import { useWishlist } from "@/context/wishlist-context"
+import { Menu, X, ShoppingBag, User, Heart } from "lucide-react";
 
 /**
  * Navbar Component
@@ -24,6 +26,12 @@ export default function Navbar() {
 
   // State to track scroll position for navbar styling
   const [isScrolled, setIsScrolled] = useState(false)
+
+  // Get cart state and functions
+  const { cartCount, toggleCart } = useCart()
+
+  // Get wishlist state
+  const { wishlistCount } = useWishlist()
 
   // Effect to handle scroll events and update navbar appearance
   useEffect(() => {
@@ -72,9 +80,21 @@ export default function Navbar() {
 
           {/* Action Icons */}
           <div className="flex items-center space-x-5">
-            <NavIcon icon={<Search size={20} strokeWidth={2} />} label="Search" />
             <NavIcon icon={<User size={20} strokeWidth={2} />} label="Account" />
-            <NavIcon icon={<ShoppingBag size={20} strokeWidth={2} />} label="Cart" badge={0} />
+            <NavIcon
+              icon={<Heart size={20} strokeWidth={2} />}
+              label="Wishlist"
+              badge={wishlistCount}
+              showBadge={true}
+              onClick={() => (window.location.href = "/wishlist")}
+            />
+            <NavIcon
+              icon={<ShoppingBag size={20} strokeWidth={2} />}
+              label="Cart"
+              badge={cartCount}
+              onClick={toggleCart}
+              showBadge={true}
+            />
           </div>
         </div>
       </nav>
@@ -100,6 +120,13 @@ export default function Navbar() {
           <Link href="/" className="text-2xl tracking-wider text-stone-900" onClick={() => setIsMenuOpen(false)}>
             CONTACT
           </Link>
+          <Link
+            href="/wishlist"
+            className="text-2xl tracking-wider text-stone-900"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            WISHLIST
+          </Link>
         </div>
       </div>
     </>
@@ -115,7 +142,7 @@ function NavItem({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
-      className="text-sm tracking-wider text-amber-700 font-medium hover:text-amber-800 relative group transition-colors"
+      className="text-sm tracking-wider text-amber-700 font-medium hover:text-amber-800 relative group transition-colors cursor-pointer"
     >
       {label}
       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-800 transition-all duration-300 group-hover:w-full"></span>
@@ -132,17 +159,25 @@ function NavIcon({
   icon,
   label,
   badge,
+  onClick,
+  showBadge = false,
 }: {
   icon: React.ReactNode
   label: string
   badge?: number
+  onClick?: () => void
+  showBadge?: boolean
 }) {
   return (
-    <button aria-label={label} className="text-amber-700 hover:text-amber-800 transition-colors relative group">
+    <button
+      aria-label={label}
+      className="text-amber-700 hover:text-amber-800 transition-colors relative group cursor-pointer"
+      onClick={onClick}
+    >
       {icon}
-      {badge !== undefined && (
-        <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-800 rounded-full text-white text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          {badge}
+      {showBadge && badge !== undefined && badge > 0 && (
+        <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-800 rounded-full text-white text-[10px] flex items-center justify-center">
+          {badge > 99 ? "99+" : badge}
         </span>
       )}
     </button>

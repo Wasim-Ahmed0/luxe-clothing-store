@@ -11,8 +11,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     // === GET /api/products/ ===
     if (req.method === 'GET') {
         // Parse optional filters
-        const { category, color, minPrice, maxPrice, sort } = req.query;
-    
+        const { category, color, minPrice, maxPrice, sort, store_id } = req.query;
+        
+        // Build product filters
         const filters: any = {};
         if (category) {
             filters.category = category as string;
@@ -26,6 +27,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             filters.variants = {
                 some: { color: color as string },
             };
+        }
+
+        // if store_id provided, only return products with inventory in that store
+        if (store_id) {
+            filters.inventory = { some: { store_id: store_id } };
         }
 
         // Building sort object (sort=price_asc) | (sort=price_desc)

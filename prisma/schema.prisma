@@ -18,7 +18,6 @@ model Store {
   store_id   String   @id @default(uuid())
   store_name String
   location   String
-  area_code  String[]
 
   users           User[]               @relation("StoreUsers")
   inventory       Inventory[]

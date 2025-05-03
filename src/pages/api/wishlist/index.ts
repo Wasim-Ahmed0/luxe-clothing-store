@@ -7,6 +7,7 @@ import { Role } from "@/generated/prisma";
 type Item = {
     wishlist_item_id: string;
     variant_id:       string;
+    product_id:       string;
     size:             string;
     color:            string;
     product_name:     string;
@@ -44,6 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         ? wishlist.items.map((wi) => ({
             wishlist_item_id: wi.wishlist_item_id,
             variant_id:       wi.variant_id,
+            product_id:       wi.variant.product_id,
             size:             wi.variant.size,
             color:            wi.variant.color,
             product_name:     wi.variant.product.name,

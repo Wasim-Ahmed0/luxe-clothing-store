@@ -15,7 +15,6 @@ interface Product {
 
 export default function ProductCard({ product }: { product: Product }) {
   const [isHovered, setIsHovered] = useState(false)
-  const [isFavorite, setIsFavorite] = useState(false)
 
   return (
     <Link
@@ -37,20 +36,6 @@ export default function ProductCard({ product }: { product: Product }) {
             }`}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          <button
-            onClick={(e) => {
-              e.preventDefault()   // don’t navigate when clicking the heart
-              setIsFavorite(!isFavorite)
-            }}
-            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center bg-white bg-opacity-80 rounded-full transition-opacity duration-300"
-          >
-            <Heart
-              size={18}
-              className={
-                isFavorite ? "fill-amber-800 text-amber-800" : "text-stone-700"
-              }
-            />
-          </button>
         </div>
         <div>
           <h3 className="text-lg font-light text-stone-900">{product.name}</h3>

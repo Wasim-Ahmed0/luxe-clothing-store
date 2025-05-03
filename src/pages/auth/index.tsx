@@ -7,6 +7,8 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react"
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
+import formImg from "../../../public/images/vintage man asset.jpg"
+
 export default function AuthPage() {
   const router = useRouter()
   const [isSignIn, setIsSignIn] = useState(true)
@@ -100,7 +102,7 @@ export default function AuthPage() {
             <div className="md:w-1/2 relative hidden md:block">
               <div className="absolute inset-0 bg-black/30 z-10" />
               <Image
-                src="/images/vintage-man-asset.jpg"
+                src={formImg}
                 alt="LUXE lifestyle"
                 fill
                 className="object-cover"
@@ -137,7 +139,7 @@ export default function AuthPage() {
                           required
                           value={email}
                           onChange={e => setEmail(e.target.value)}
-                          className="block w-full pl-10 pr-3 py-2 border border-stone-300 rounded-md shadow-sm placeholder-stone-400 focus:outline-none focus:ring-amber-800 focus:border-amber-800 sm:text-sm"
+                          className="block w-full pl-10 pr-3 py-2 text-stone-900 border border-stone-300 rounded-md shadow-sm placeholder-stone-400 focus:outline-none focus:ring-amber-800 focus:border-amber-800 sm:text-sm"
                           placeholder="you@example.com"
                         />
                       </div>
@@ -154,7 +156,7 @@ export default function AuthPage() {
                           required
                           value={password}
                           onChange={e => setPassword(e.target.value)}
-                          className="block w-full pl-10 pr-10 py-2 border border-stone-300 rounded-md shadow-sm placeholder-stone-400 focus:outline-none focus:ring-amber-800 focus:border-amber-800 sm:text-sm"
+                          className="block w-full pl-10 pr-10 py-2 text-stone-900 border border-stone-300 rounded-md shadow-sm placeholder-stone-400 focus:outline-none focus:ring-amber-800 focus:border-amber-800 sm:text-sm"
                           placeholder="••••••••"
                         />
                         <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center" onClick={() => setShowPassword(!showPassword)}>

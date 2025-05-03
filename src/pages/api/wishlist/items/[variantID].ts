@@ -19,7 +19,10 @@ export default async function handler(req: NextApiRequest,res: NextApiResponse<S
         return res.status(403).json({ success: false, error: "Forbidden" });
     }
 
-    const { variantId } = req.query;
+    const variantId = typeof req.query.variantId === "string" ? req.query.variantId
+                        : typeof req.query.variantID === "string" ? req.query.variantID:
+                        undefined;
+
     if (typeof variantId !== "string") {
         return res.status(400).json({ success: false, error: "Invalid variant ID" });
     }
