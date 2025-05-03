@@ -509,7 +509,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   disabled={!isComplete}
                   className={`py-3 px-6 text-white text-sm tracking-wider ${
                     isComplete
-                      ? "bg-stone-900 hover:bg-stone-800"
+                      ? "bg-stone-900 hover:bg-stone-800 cursor-pointer"
                       : "bg-stone-400 cursor-not-allowed"
                   }`}
                 >

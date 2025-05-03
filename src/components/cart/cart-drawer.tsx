@@ -358,9 +358,10 @@
 //   )
 // }
 // components/cart/cart-drawer.tsx
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { X, Minus, Plus, ShoppingBag } from "lucide-react"
 import { useCart } from "@/context/cart-context"
 
@@ -375,50 +376,84 @@ export default function CartDrawer() {
     cartCount,
   } = useCart()
   const drawerRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
-  // Lock scroll when open
+  // lock scroll when open
   useEffect(() => {
     document.body.style.overflow = isCartOpen ? "hidden" : ""
     return () => { document.body.style.overflow = "" }
   }, [isCartOpen])
 
-  // Don’t render anything when closed
+  // don’t render when closed
   if (!isCartOpen) return null
 
   const fmt = (v: number) =>
     new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(v)
 
+  // read cart_id from cookie
+  const getCartId = (): string | null => {
+    if (typeof document === "undefined") return null
+    const m = document.cookie.match(/(?:^|;\s*)cart_id=([^;]+)/)
+    return m?.[1] ?? null
+  }
+
+  // create order + redirect
+  const handleCheckout = async () => {
+    const cart_id = getCartId()
+    if (!cart_id) {
+      alert("No cart found.")
+      return
+    }
+
+    setLoading(true)
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cart_id }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Checkout failed")
+      }
+      closeCart()
+      router.push(`/checkout?orderID=${data.order_id}&token=${data.checkoutToken}`)
+    } catch (err: any) {
+      console.error(err)
+      alert(err.message || "Something went wrong")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 block">
-      {/* full‑screen backdrop */}
+      {/* backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={closeCart}
       />
 
-      {/* actual drawer panel */}
+      {/* drawer */}
       <div
         ref={drawerRef}
         onClick={(e) => e.stopPropagation()}
         className="absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-xl transform translate-x-0 transition-transform duration-300 ease-in-out"
       >
         <div className="flex flex-col h-full">
-          {/* Header */}
+          {/* header */}
           <div className="flex items-center justify-between p-6 border-b border-stone-200">
             <h2 className="text-xl font-light text-stone-900 flex items-center">
               <ShoppingBag size={20} className="mr-2" />
               Your Cart {cartCount > 0 && `(${cartCount})`}
             </h2>
-            <button
-              onClick={closeCart}
-              className="text-stone-500 hover:text-stone-700"
-              aria-label="Close cart"
-            >
+            <button onClick={closeCart} className="text-stone-500 hover:text-stone-700">
               <X size={24} />
             </button>
           </div>
 
-          {/* Content */}
+          {/* content */}
           <div className="flex-1 overflow-y-auto p-6">
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
@@ -427,7 +462,7 @@ export default function CartDrawer() {
                 <Link
                   href="/shop"
                   onClick={closeCart}
-                  className="px-6 py-2 bg-amber-800 text-white hover:bg-amber-700"
+                  className="px-6 py-2 bg-amber-800 text-white hover:bg-amber-700 rounded"
                 >
                   Continue Shopping
                 </Link>
@@ -436,7 +471,7 @@ export default function CartDrawer() {
               <div className="space-y-6">
                 {items.map((item) => (
                   <div key={item.id} className="flex border-b border-stone-200 pb-6">
-                    {/* Image */}
+                    {/* image */}
                     <div className="w-20 h-24 bg-stone-100 relative flex-shrink-0">
                       <Image
                         src={item.image || "/placeholder.svg"}
@@ -447,12 +482,10 @@ export default function CartDrawer() {
                       />
                     </div>
 
-                    {/* Details */}
+                    {/* details */}
                     <div className="ml-4 flex-1">
                       <div className="flex justify-between">
-                        <h3 className="text-sm font-medium text-stone-900">
-                          {item.name}
-                        </h3>
+                        <h3 className="text-sm font-medium text-stone-900">{item.name}</h3>
                         <button
                           onClick={() => removeItem(item.id)}
                           className="text-stone-400 hover:text-stone-600"
@@ -468,15 +501,15 @@ export default function CartDrawer() {
                         <div className="flex items-center border border-stone-300">
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="px-2 py-1 text-stone-500 hover:text-stone-700"
+                            className="px-2 py-1 text-stone-700 hover:text-stone-900"
                             aria-label="Decrease quantity"
                           >
                             <Minus size={14} />
                           </button>
-                          <span className="px-2 text-sm">{item.quantity}</span>
+                          <span className="px-2 text-sm text-stone-900">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="px-2 py-1 text-stone-500 hover:text-stone-700"
+                            className="px-2 py-1 text-stone-700 hover:text-stone-900"
                             aria-label="Increase quantity"
                           >
                             <Plus size={14} />
@@ -493,22 +526,26 @@ export default function CartDrawer() {
             )}
           </div>
 
-          {/* Footer */}
+          {/* footer */}
           {items.length > 0 && (
-            <div className="p-6 border-t border-stone-200">
-              <div className="flex justify-between mb-4">
-                <span className="text-stone-600">Subtotal</span>
+            <div className="p-6 border-t border-stone-200 space-y-4">
+              <div className="flex justify-between text-stone-600">
+                <span>Subtotal</span>
                 <span className="font-medium text-stone-900">{fmt(cartTotal)}</span>
               </div>
-              <p className="text-xs text-stone-500 mb-4">
-                Shipping and taxes calculated at checkout
-              </p>
-              <button className="w-full py-3 bg-amber-800 text-white hover:bg-amber-700 mb-3">
-                CHECKOUT
+              <p className="text-xs text-stone-500">Shipping and taxes calculated at checkout</p>
+              <button
+                onClick={handleCheckout}
+                disabled={loading}
+                className={`w-full py-3 ${
+                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-amber-800 hover:bg-amber-700"
+                } text-white rounded transition-colors`}
+              >
+                {loading ? "Processing…" : "CHECKOUT"}
               </button>
               <button
                 onClick={closeCart}
-                className="w-full py-3 border border-stone-300 text-stone-700 hover:bg-stone-50"
+                className="w-full py-3 border border-stone-300 text-stone-700 hover:bg-stone-50 rounded transition-colors"
               >
                 CONTINUE SHOPPING
               </button>
