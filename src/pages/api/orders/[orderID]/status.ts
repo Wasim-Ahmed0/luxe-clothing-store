@@ -72,6 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         data: { order_status: status },
     });
 
+    // delete the cart 
     if (status === "completed" && cart_id) {
         try {
           await prisma.virtualCart.delete({ where: { cart_id } });
