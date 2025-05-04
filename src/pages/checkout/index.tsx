@@ -164,19 +164,23 @@
 //     </>
 //   )
 // }
-import React, { useEffect } from 'react'
-import { useRouter } from 'next/router'
-import '../../styles/animations.css'
+// pages/checkout/index.tsx
+import React, { useEffect } from "react"
+import { useRouter } from "next/router"
+import "../../styles/animations.css"
 
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
-import OrderSummary from '@/components/checkout/OrderSummary'
-import PaymentForm from '@/components/checkout/PaymentForm'
-import ConfirmationView from '@/components/checkout/ConfirmationView'
-import useCheckout from '../../../hooks/useCheckout'
+import Navbar from "@/components/layout/Navbar"
+import Footer from "@/components/layout/Footer"
+import OrderSummary from "@/components/checkout/OrderSummary"
+import PaymentForm from "@/components/checkout/PaymentForm"
+import ConfirmationView from "@/components/checkout/ConfirmationView"
+import useCheckout from "../../../hooks/useCheckout"
+import { useCart } from "@/context/cart-context"
+import type { Order } from "../../../types/checkout"
 
 export default function CheckoutPage() {
   const router = useRouter()
+  const { items: cartItems, cartTotal } = useCart()
   const {
     currentStep,
     order,
@@ -190,25 +194,19 @@ export default function CheckoutPage() {
     isPaymentValid,
   } = useCheckout()
 
-  // Redirect to /shop if we’re on summary but have no order
+  // If they land here with an empty cart, bounce back to shop
   useEffect(() => {
     if (!router.isReady) return
-    if (
-      currentStep === 'summary' &&
-      !loading &&
-      !error &&
-      !order
-    ) {
-      router.replace('/shop')
+    if (currentStep === "summary" && cartItems.length === 0) {
+      router.replace("/shop")
     }
-  }, [router.isReady, currentStep, loading, error, order, router])
+  }, [router.isReady, currentStep, cartItems.length, router])
 
-  const stepIndex = { summary: 1, payment: 2, confirmation: 3 }[currentStep]
+  const stepIndex = { summary: 1, payment: 2, confirmation: 3 }[currentStep]!
 
   return (
     <>
       <Navbar />
-
       <main className="min-h-screen bg-gray-100 py-8 px-4 pt-24">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* Progress Bar */}
@@ -220,24 +218,24 @@ export default function CheckoutPage() {
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center ${
                         stepIndex >= n
-                          ? 'bg-amber-900 text-white'
-                          : 'bg-gray-200 text-stone-700'
+                          ? "bg-amber-900 text-white"
+                          : "bg-gray-200 text-stone-700"
                       }`}
                     >
                       {n}
                     </div>
                     <span className="text-sm mt-1 font-medium text-stone-900">
                       {n === 1
-                        ? 'Summary'
+                        ? "Summary"
                         : n === 2
-                        ? 'Payment'
-                        : 'Confirmation'}
+                        ? "Payment"
+                        : "Confirmation"}
                     </span>
                   </div>
                   {n < 3 && (
                     <div
                       className={`flex-1 h-1 mx-2 transition-colors duration-200 ${
-                        stepIndex > n ? 'bg-amber-700' : 'bg-gray-200'
+                        stepIndex > n ? "bg-amber-700" : "bg-gray-200"
                       }`}
                     />
                   )}
@@ -248,19 +246,31 @@ export default function CheckoutPage() {
 
           {/* Card Container */}
           <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
-            {currentStep === 'summary' && loading && (
-              <div className="flex justify-center py-16">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900" />
-              </div>
-            )}
-            {currentStep === 'summary' && error && (
-              <div className="text-red-500 text-center py-8">{error}</div>
-            )}
-            {currentStep === 'summary' && order && (
-              <OrderSummary order={order} onNext={nextStep} />
+            {/* --- SUMMARY STEP --- */}
+            {currentStep === "summary" && (
+              <OrderSummary
+                order={
+                  {
+                    order_id: "",
+                    created_at: new Date().toISOString(),
+                    total_amount: cartTotal,
+                    items: cartItems.map((it) => ({
+                      variant_id: it.variant_id,
+                      quantity: it.quantity,
+                      price_at_purchase: it.price,
+                      image: it.image,
+                      name: it.name,
+                      color: it.color,
+                      size: it.size,
+                    })),
+                  } as Order
+                }
+                onNext={nextStep}
+              />
             )}
 
-            {currentStep === 'payment' && order && (
+            {/* --- PAYMENT STEP --- */}
+            {currentStep === "payment" && (
               <PaymentForm
                 paymentDetails={paymentDetails}
                 onChange={handlePaymentChange}
@@ -271,13 +281,18 @@ export default function CheckoutPage() {
               />
             )}
 
-            {currentStep === 'confirmation' && order && (
+            {/* --- CONFIRMATION STEP --- */}
+            {currentStep === "confirmation" && order && (
               <ConfirmationView order={order} />
+            )}
+
+            {/* ERROR MESSAGE */}
+            {error && (
+              <div className="text-red-500 text-center mt-4">{error}</div>
             )}
           </div>
         </div>
       </main>
-
       <Footer />
     </>
   )

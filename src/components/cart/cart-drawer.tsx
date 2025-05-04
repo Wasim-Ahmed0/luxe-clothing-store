@@ -358,10 +358,10 @@
 //   )
 // }
 // components/cart/cart-drawer.tsx
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/router"
 import { X, Minus, Plus, ShoppingBag } from "lucide-react"
 import { useCart } from "@/context/cart-context"
 
@@ -377,54 +377,42 @@ export default function CartDrawer() {
   } = useCart()
   const drawerRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
 
-  // lock scroll when open
+  // Lock scroll when open
   useEffect(() => {
     document.body.style.overflow = isCartOpen ? "hidden" : ""
-    return () => { document.body.style.overflow = "" }
+    return () => {
+      document.body.style.overflow = ""
+    }
   }, [isCartOpen])
 
-  // don’t render when closed
   if (!isCartOpen) return null
 
   const fmt = (v: number) =>
-    new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(v)
+    new Intl.NumberFormat("en-GB", {
+      style: "currency",
+      currency: "GBP",
+    }).format(v)
 
-  // read cart_id from cookie
   const getCartId = (): string | null => {
     if (typeof document === "undefined") return null
     const m = document.cookie.match(/(?:^|;\s*)cart_id=([^;]+)/)
     return m?.[1] ?? null
   }
 
-  // create order + redirect
-  const handleCheckout = async () => {
+  // Just navigate to /checkout with cart_id; actual order creation
+  // will happen on the Payment step.
+  const handleCheckout = () => {
     const cart_id = getCartId()
     if (!cart_id) {
       alert("No cart found.")
       return
     }
-
-    setLoading(true)
-    try {
-      const res = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart_id }),
-      })
-      const data = await res.json()
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Checkout failed")
-      }
-      closeCart()
-      router.push(`/checkout?orderID=${data.order_id}&token=${data.checkoutToken}`)
-    } catch (err: any) {
-      console.error(err)
-      alert(err.message || "Something went wrong")
-    } finally {
-      setLoading(false)
-    }
+    closeCart()
+    router.push({
+      pathname: "/checkout",
+      query: { cart_id },
+    })
   }
 
   return (
@@ -442,18 +430,21 @@ export default function CartDrawer() {
         className="absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-xl transform translate-x-0 transition-transform duration-300 ease-in-out"
       >
         <div className="flex flex-col h-full">
-          {/* header */}
+          {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-stone-200">
             <h2 className="text-xl font-light text-stone-900 flex items-center">
               <ShoppingBag size={20} className="mr-2" />
               Your Cart {cartCount > 0 && `(${cartCount})`}
             </h2>
-            <button onClick={closeCart} className="text-stone-500 hover:text-stone-700">
+            <button
+              onClick={closeCart}
+              className="text-stone-500 hover:text-stone-700 cursor-pointer"
+            >
               <X size={24} />
             </button>
           </div>
 
-          {/* content */}
+          {/* Content */}
           <div className="flex-1 overflow-y-auto p-6">
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
@@ -462,7 +453,7 @@ export default function CartDrawer() {
                 <Link
                   href="/shop"
                   onClick={closeCart}
-                  className="px-6 py-2 bg-amber-800 text-white hover:bg-amber-700 rounded"
+                  className="px-6 py-2 bg-amber-800 text-white hover:bg-amber-700 rounded cursor-pointer"
                 >
                   Continue Shopping
                 </Link>
@@ -471,10 +462,10 @@ export default function CartDrawer() {
               <div className="space-y-6">
                 {items.map((item) => (
                   <div key={item.id} className="flex border-b border-stone-200 pb-6">
-                    {/* image */}
+                    {/* Image */}
                     <div className="w-20 h-24 bg-stone-100 relative flex-shrink-0">
                       <Image
-                        src={item.image || "/placeholder.svg"}
+                        src={"/placeholder.svg"}
                         alt={item.name}
                         fill
                         className="object-cover"
@@ -482,34 +473,43 @@ export default function CartDrawer() {
                       />
                     </div>
 
-                    {/* details */}
+                    {/* Details */}
                     <div className="ml-4 flex-1">
                       <div className="flex justify-between">
-                        <h3 className="text-sm font-medium text-stone-900">{item.name}</h3>
+                        <h3 className="text-sm font-medium text-stone-900">
+                          {item.name}
+                        </h3>
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="text-stone-400 hover:text-stone-600"
+                          className="text-stone-400 hover:text-stone-600 cursor-pointer"
                           aria-label="Remove item"
                         >
                           <X size={16} />
                         </button>
                       </div>
-                      <p className="text-xs text-stone-500 mt-1">
-                        {item.size} | {item.color}
+                      <p className="text-xs text-stone-900 mt-1">
+                        Size: {item.size}
+                        {item.color && item.color !== "Default"
+                          ? ` • ${item.color}`
+                          : ""}
                       </p>
                       <div className="flex justify-between items-center mt-2">
                         <div className="flex items-center border border-stone-300">
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            className="px-2 py-1 text-stone-700 hover:text-stone-900"
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity - 1)
+                            }
+                            className="px-2 py-1 text-stone-400 hover:text-stone-900"
                             aria-label="Decrease quantity"
                           >
                             <Minus size={14} />
                           </button>
                           <span className="px-2 text-sm text-stone-900">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="px-2 py-1 text-stone-700 hover:text-stone-900"
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity + 1)
+                            }
+                            className="px-2 py-1 text-stone-400 hover:text-stone-900"
                             aria-label="Increase quantity"
                           >
                             <Plus size={14} />
@@ -526,26 +526,25 @@ export default function CartDrawer() {
             )}
           </div>
 
-          {/* footer */}
+          {/* Footer */}
           {items.length > 0 && (
             <div className="p-6 border-t border-stone-200 space-y-4">
               <div className="flex justify-between text-stone-600">
                 <span>Subtotal</span>
                 <span className="font-medium text-stone-900">{fmt(cartTotal)}</span>
               </div>
-              <p className="text-xs text-stone-500">Shipping and taxes calculated at checkout</p>
+              <p className="text-xs text-stone-500">
+                Shipping and taxes calculated at checkout
+              </p>
               <button
                 onClick={handleCheckout}
-                disabled={loading}
-                className={`w-full py-3 ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-amber-800 hover:bg-amber-700"
-                } text-white rounded transition-colors`}
+                className="w-full py-3 bg-amber-800 text-white hover:bg-amber-700 rounded transition-colors cursor-pointer"
               >
-                {loading ? "Processing…" : "CHECKOUT"}
+                CHECKOUT
               </button>
               <button
                 onClick={closeCart}
-                className="w-full py-3 border border-stone-300 text-stone-700 hover:bg-stone-50 rounded transition-colors"
+                className="w-full py-3 border border-stone-300 text-stone-700 hover:bg-stone-200 rounded transition-colors cursor-pointer"
               >
                 CONTINUE SHOPPING
               </button>

@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(400).json({ success: false, error: "Invalid order ID" });
     }
 
-    const { status } = req.body as { status?: OrderStatus };
+    const { status, cart_id, store_id } = req.body as { status?: OrderStatus; cart_id?: string; store_id?: string };
     if (
         status !== "pending" &&
         status !== "completed" &&
@@ -42,18 +42,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     if (!order) {
         return res.status(404).json({ success: false, error: "Order not found" });
     }
+    
+    // load default store ID from env
+    const defaultStore = process.env.NEXT_PUBLIC_DEFAULT_STORE_ID;
 
-    // Authorise: only employees may mark completed; customers may cancel their own
+
     if (status === "completed") {
-        if (me.role !== Role.employee && me.role !== Role.store_manager) {
-            return res.status(403).json({ success: false, error: "Forbidden" });
+        // if not online store, require staff authentication
+        console.log(defaultStore)
+        console.log(store_id)
+        if (store_id !== defaultStore) {
+            if (me.role !== Role.employee && me.role !== Role.store_manager) {
+                return res.status(403).json({ success: false, error: "Forbidden" });
+            }
         }
+        // else, its the online store so no need for auth
     } else if (status === "cancelled") {
         if (order.user_id !== me.id) {
             return res.status(403).json({ success: false, error: "Forbidden" });
         }
     } else {
-        // you generally never set back to pending
+        // dissallow re-setting back to pending status
         return res.status(400).json({ success: false, error: "Cannot set to pending" });
     }
 
@@ -62,6 +71,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         where: { order_id: orderID },
         data: { order_status: status },
     });
+
+    if (status === "completed" && cart_id) {
+        try {
+          await prisma.virtualCart.delete({ where: { cart_id } });
+        } catch (e) {
+          console.error("Failed to delete cart:", e);
+        }
+      }    
 
     return res.status(200).json({ success: true, order_id: updated.order_id, status: updated.order_status });
 }

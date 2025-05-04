@@ -45,9 +45,6 @@ const ConfirmationView: React.FC<ConfirmationViewProps> = ({ order }) => {
           <p className="text-sm text-gray-600">
             Your order will be ready for pickup or delivery within 2–3 business days.
           </p>
-          <p className="text-sm text-gray-600 mt-2">
-            You will receive an email with tracking information once your order ships.
-          </p>
         </div>
       </div>
       

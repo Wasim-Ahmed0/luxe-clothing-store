@@ -80,9 +80,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
               });              
         }
 
-        // cascade‐delete its CartItem children
-        await tx.virtualCart.delete({ where: { cart_id } });
-
         return order;
     });
 

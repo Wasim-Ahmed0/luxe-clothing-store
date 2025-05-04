@@ -129,7 +129,7 @@ export default function OrderSummary({ order, onNext }: OrderSummaryProps) {
       <div className="flex justify-end">
         <button
           onClick={onNext}
-          className="bg-gray-900 hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-md transition-colors duration-200"
+          className="bg-gray-900 hover:bg-gray-800 text-white font-medium py-2 px-6 rounded-md transition-colors duration-200 cursor-pointer"
         >
           Continue to Payment
         </button>

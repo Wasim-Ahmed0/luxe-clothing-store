@@ -10,6 +10,12 @@ export interface OrderItem {
     price_at_purchase: number;
   }
   
+  export interface ApiOrderDetail {
+    variant_id:        string;
+    quantity:           number;
+    price_at_purchase:  number;
+  }
+  
   export interface Order {
     order_id: string;
     created_at: string;       // ISO timestamp
