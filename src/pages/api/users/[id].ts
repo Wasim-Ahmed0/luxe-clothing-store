@@ -54,10 +54,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         newPassword?: string
     }
 
-    // if changing email / password then require their current password
-    if ((email && !currentPassword) || (newPassword && !currentPassword)) {
-        return res.status(400).json({ success: false, error: "Current password is required to change email or password" })
-    }
+    // only require currentPassword when changing password
+    if (newPassword && !currentPassword) {
+      return res.status(400).json({ success: false, error: "Current password is required to change password" });
+  }
 
     // if provided their current password then verify
     if (currentPassword) {

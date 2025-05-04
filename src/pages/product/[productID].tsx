@@ -147,11 +147,16 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               <button
                 onClick={() => variantId && toggleItem(variantId)}
                 disabled={!variantId || wLoading}
-                className={`absolute top-0 right-0 w-10 h-10 flex items-center justify-center transition-colors cursor-pointer ${
+                className={`absolute top-0 right-0 w-10 h-10 flex items-center justify-center transition-colors ${
                   isFavorite
                     ? "text-red-500"
                     : "text-stone-500 hover:text-amber-800"
-                }`}
+                  } 
+                  ${
+                    !variantId || wLoading
+                    ? "cusor-not-allowed" : "cursor-pointer"
+                  }
+                  `}
               >
                 <Heart
                   size={24}

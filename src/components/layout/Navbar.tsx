@@ -80,7 +80,11 @@ export default function Navbar() {
 
           {/* Action Icons */}
           <div className="flex items-center space-x-5">
-            <NavIcon icon={<User size={20} strokeWidth={2} />} label="Account" />
+            <NavIcon 
+              icon={<User size={20} strokeWidth={2} />} 
+              label="Account" 
+              onClick={() => (window.location.href = "/account")}
+              />
             <NavIcon
               icon={<Heart size={20} strokeWidth={2} />}
               label="Wishlist"
