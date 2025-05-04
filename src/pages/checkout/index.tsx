@@ -1,188 +1,173 @@
-// // pages/checkout/index.tsx
-// import '../../styles/animations.css'
-// import Navbar from '@/components/layout/Navbar'
-// import Footer from '@/components/layout/Footer'
-// import OrderSummary from '@/components/checkout/OrderSummary'
-// import PaymentForm from '@/components/checkout/PaymentForm'
-// import ConfirmationView from '@/components/checkout/ConfirmationView'
-// import useCheckout from '../../../hooks/useCheckout'
+// import React, { useEffect } from "react"
+// import { useRouter } from "next/router"
+// import "../../styles/animations.css"
 
-
-// import { useState } from 'react'
-// import type { Order, PaymentDetails } from '../../../types/checkout'
+// import Navbar from "@/components/layout/Navbar"
+// import Footer from "@/components/layout/Footer"
+// import OrderSummary from "@/components/checkout/OrderSummary"
+// import PaymentForm from "@/components/checkout/PaymentForm"
+// import ConfirmationView from "@/components/checkout/ConfirmationView"
+// import useCheckout from "../../../hooks/useCheckout"
+// import { useCart } from "@/context/cart-context"
+// import type { Order } from "../../../types/checkout"
+// import { useSession } from "next-auth/react"
 
 // export default function CheckoutPage() {
-//   const [step, setStep] = useState<'summary'|'payment'|'confirmation'>('summary')
+//   const router = useRouter();
+//   const { data: session, status } = useSession();
 
-//   const mockOrder: Order = {
-//     order_id:     'ord_12345678',
-//     created_at:   new Date().toISOString(),
-//     total_amount: 120.0,
-//     items: [
-//       {
-//         variant_id:        'var_abc123',
-//         image:             '/placeholder.svg',
-//         name:              'Classic Tee',
-//         color:             'Navy',
-//         size:              'M',
-//         quantity:          2,
-//         price_at_purchase: 30.0,
-//       },
-//       {
-//         variant_id:        'var_def456',
-//         image:             '/placeholder.svg',
-//         name:              'Sneaker Run',
-//         color:             'White',
-//         size:              '9',
-//         quantity:          1,
-//         price_at_purchase: 60.0,
-//       },
-//     ],
-//   }
+//   const { items: cartItems, cartTotal } = useCart()
+//   const {
+//     currentStep,
+//     order,
+//     loading,
+//     error,
+//     paymentDetails,
+//     handlePaymentChange,
+//     nextStep,
+//     prevStep,
+//     submitPayment,
+//     isPaymentValid,
+//   } = useCheckout()
 
-//   // --- 2) Local state for your form fields ---
-//   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
-//     cardNumber: '',
-//     cardHolder: '',
-//     expiryDate: '',
-//     cvv:        '',
-//   })
-
-//   const isPaymentValid = (): boolean => {
-//     const { cardNumber, cardHolder, expiryDate, cvv } = paymentDetails
-  
-//     // Strip spaces for card number length check
-//     const digitsOnly = cardNumber.replace(/\s+/g, '')
-  
+//   // while session loading, show spinner
+//   if (status === "loading") {
 //     return (
-//         // 13–19 digits, digits only
-//         /^\d{13,19}$/.test(digitsOnly) &&
-//         // non‐empty name
-//         cardHolder.trim().length > 0 &&
-//         // MM/YY format
-//         /^\d{2}\/\d{2}$/.test(expiryDate) &&
-//         // three‐digit CVV
-//         /^\d{3}$/.test(cvv)
+//       <div className="min-h-screen flex items-center justify-center">
+//         <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-gray-900" />
+//       </div>
 //     )
 //   }
+
+//   // if unauthenticated, redirect to auth
+//   useEffect(() => {
+//     if (status === "unauthenticated") {
+//       router.replace("/auth");
+//     }
+//   }, [status, router]);
+
+//   // If they land here with an empty cart, bounce back to shop
+//   useEffect(() => {
+//     if (!router.isReady) return
+//     if (currentStep === "summary" && cartItems.length === 0) {
+//       router.replace("/shop")
+//     }
+//   }, [router.isReady, currentStep, cartItems.length, router])
+
+//   const stepIndex = { summary: 1, payment: 2, confirmation: 3 }[currentStep]!
 
 //   return (
 //     <>
 //       <Navbar />
-
-//       <main className="min-h-screen bg-gray-100 py-8 px-4 pt-30">
+//       <main className="min-h-screen bg-gray-100 py-8 px-4 pt-24">
 //         <div className="max-w-4xl mx-auto space-y-8">
-//           {/* --- Progress Bar --- */}
+//           {/* Progress Bar */}
 //           <div className="bg-white rounded-lg shadow-sm p-4">
 //             <div className="flex items-center justify-between max-w-md mx-auto">
-//               {/* Step 1 */}
-//               <div className="flex flex-col items-center">
-//                 <div
-//                   className={`w-8 h-8 rounded-full flex items-center justify-center ${
-//                     (step === 'summary' || step === 'payment' || step === 'confirmation')
-//                       ? 'bg-amber-900 text-white'
-//                       : 'bg-gray-200 text-stone-900'
-//                   }`}
-//                 >
-//                   1
-//                 </div>
-//                 <span className="text-md mt-1 font-medium text-stone-900">Summary</span>
-//               </div>
-
-//               <div
-//                 className={`flex-1 h-1 mx-2 transition-colors duration-200 ${
-//                   (step === 'payment' || step === 'confirmation')
-//                     ? 'bg-amber-700'
-//                     : 'bg-gray-200'
-//                 }`}
-//               />
-
-//               {/* Step 2 */}
-//               <div className="flex flex-col items-center">
-//                 <div
-//                   className={`w-8 h-8 rounded-full flex items-center justify-center ${
-//                     (step === 'payment' || step === 'confirmation')
-//                       ? 'bg-amber-900 text-white'
-//                       : 'bg-gray-200 text-stone-700'
-//                   }`}
-//                 >
-//                   2
-//                 </div>
-//                 <span className="text-md mt-1 font-medium text-stone-900">Payment</span>
-//               </div>
-
-//               <div
-//                 className={`flex-1 h-1 mx-2 transition-colors duration-200 ${
-//                   step === 'confirmation' ? 'bg-amber-700' : 'bg-gray-200'
-//                 }`}
-//               />
-
-//               {/* Step 3 */}
-//               <div className="flex flex-col items-center">
-//                 <div
-//                   className={`w-8 h-8 rounded-full flex items-center justify-center ${
-//                     step === 'confirmation'
-//                       ? 'bg-amber-900 text-white'
-//                       : 'bg-gray-200 text-stone-700'
-//                   }`}
-//                 >
-//                   3
-//                 </div>
-//                 <span className="text-md mt-1 font-medium text-stone-900">Confirmation</span>
-//               </div>
+//               {[1, 2, 3].map((n) => (
+//                 <React.Fragment key={n}>
+//                   <div className="flex flex-col items-center">
+//                     <div
+//                       className={`w-8 h-8 rounded-full flex items-center justify-center ${
+//                         stepIndex >= n
+//                           ? "bg-amber-900 text-white"
+//                           : "bg-gray-200 text-stone-700"
+//                       }`}
+//                     >
+//                       {n}
+//                     </div>
+//                     <span className="text-sm mt-1 font-medium text-stone-900">
+//                       {n === 1
+//                         ? "Summary"
+//                         : n === 2
+//                         ? "Payment"
+//                         : "Confirmation"}
+//                     </span>
+//                   </div>
+//                   {n < 3 && (
+//                     <div
+//                       className={`flex-1 h-1 mx-2 transition-colors duration-200 ${
+//                         stepIndex > n ? "bg-amber-700" : "bg-gray-200"
+//                       }`}
+//                     />
+//                   )}
+//                 </React.Fragment>
+//               ))}
 //             </div>
 //           </div>
 
-//           {/* --- Card Container --- */}
+//           {/* Card Container */}
 //           <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
-//             {step === 'summary' && (
+//             {/* --- SUMMARY STEP --- */}
+//             {currentStep === "summary" && (
 //               <OrderSummary
-//                 order={mockOrder}
-//                 onNext={() => setStep('payment')}
+//                 order={
+//                   {
+//                     order_id: "",
+//                     created_at: new Date().toISOString(),
+//                     total_amount: cartTotal,
+//                     items: cartItems.map((it) => ({
+//                       variant_id: it.variant_id,
+//                       quantity: it.quantity,
+//                       price_at_purchase: it.price,
+//                       image: it.image,
+//                       name: it.name,
+//                       color: it.color,
+//                       size: it.size,
+//                     })),
+//                   } as Order
+//                 }
+//                 onNext={nextStep}
 //               />
 //             )}
-//             {step === 'payment' && (
+
+//             {/* --- PAYMENT STEP --- */}
+//             {currentStep === "payment" && (
 //               <PaymentForm
 //                 paymentDetails={paymentDetails}
-//                 onChange={(field, value) => {
-//                     setPaymentDetails(pd => ({ ...pd, [field]: value }))
-//                 }}
-//                 onBack={() => setStep('summary')}
-//                 onSubmit={() => setStep('confirmation')}
+//                 onChange={handlePaymentChange}
+//                 onBack={prevStep}
+//                 onSubmit={submitPayment}
 //                 isValid={isPaymentValid()}
-//                 isLoading={false}
+//                 isLoading={loading}
 //               />
 //             )}
-//             {step === 'confirmation' && (
-//               <ConfirmationView order={mockOrder} />
+
+//             {/* --- CONFIRMATION STEP --- */}
+//             {currentStep === "confirmation" && order && (
+//               <ConfirmationView order={order} />
+//             )}
+
+//             {/* ERROR MESSAGE */}
+//             {error && (
+//               <div className="text-red-500 text-center mt-4">{error}</div>
 //             )}
 //           </div>
 //         </div>
 //       </main>
-
 //       <Footer />
 //     </>
 //   )
 // }
+
+
 // pages/checkout/index.tsx
-import React, { useEffect } from "react"
-import { useRouter } from "next/router"
+import React, { useEffect, useState } from "react"
+import { useRouter }        from "next/router"
 import "../../styles/animations.css"
 
-import Navbar from "@/components/layout/Navbar"
-import Footer from "@/components/layout/Footer"
-import OrderSummary from "@/components/checkout/OrderSummary"
-import PaymentForm from "@/components/checkout/PaymentForm"
+import Navbar           from "@/components/layout/Navbar"
+import Footer           from "@/components/layout/Footer"
+import OrderSummary     from "@/components/checkout/OrderSummary"
+import PaymentForm      from "@/components/checkout/PaymentForm"
 import ConfirmationView from "@/components/checkout/ConfirmationView"
-import useCheckout from "../../../hooks/useCheckout"
-import { useCart } from "@/context/cart-context"
-import type { Order } from "../../../types/checkout"
-import { useSession } from "next-auth/react"
+import InStoreQRCode    from "@/components/checkout/InStoreQRCode"
+import useCheckout      from "../../../hooks/useCheckout"
+import { useCart }      from "@/context/cart-context"
+import type { Order }   from "../../../types/checkout"
 
 export default function CheckoutPage() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
-
+  const router = useRouter()
   const { items: cartItems, cartTotal } = useCart()
   const {
     currentStep,
@@ -197,29 +182,22 @@ export default function CheckoutPage() {
     isPaymentValid,
   } = useCheckout()
 
-  // while session loading, show spinner
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-gray-900" />
-      </div>
-    )
-  }
-
-  // if unauthenticated, redirect to auth
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.replace("/auth");
-    }
-  }, [status, router]);
-
-  // If they land here with an empty cart, bounce back to shop
+  // Redirect to /shop if cart empty at summary
   useEffect(() => {
     if (!router.isReady) return
     if (currentStep === "summary" && cartItems.length === 0) {
       router.replace("/shop")
     }
   }, [router.isReady, currentStep, cartItems.length, router])
+
+  // Determine in‑store vs online
+  const defaultStore = process.env.NEXT_PUBLIC_DEFAULT_STORE_ID!
+  const [isInStore, setIsInStore] = useState(false)
+  useEffect(() => {
+    const m = document.cookie.match(/(?:^|;\s*)store_id=([^;]+)/)
+    const storeId = m?.[1] ?? defaultStore
+    setIsInStore(storeId !== defaultStore)
+  }, [])
 
   const stepIndex = { summary: 1, payment: 2, confirmation: 3 }[currentStep]!
 
@@ -228,36 +206,23 @@ export default function CheckoutPage() {
       <Navbar />
       <main className="min-h-screen bg-gray-100 py-8 px-4 pt-24">
         <div className="max-w-4xl mx-auto space-y-8">
+
           {/* Progress Bar */}
           <div className="bg-white rounded-lg shadow-sm p-4">
             <div className="flex items-center justify-between max-w-md mx-auto">
-              {[1, 2, 3].map((n) => (
+              {[1,2,3].map((n) => (
                 <React.Fragment key={n}>
                   <div className="flex flex-col items-center">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        stepIndex >= n
-                          ? "bg-amber-900 text-white"
-                          : "bg-gray-200 text-stone-700"
-                      }`}
-                    >
-                      {n}
-                    </div>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      stepIndex>=n ? "bg-amber-900 text-white":"bg-gray-200 text-stone-700"
+                    }`}>{n}</div>
                     <span className="text-sm mt-1 font-medium text-stone-900">
-                      {n === 1
-                        ? "Summary"
-                        : n === 2
-                        ? "Payment"
-                        : "Confirmation"}
+                      {n===1?"Summary": n===2?"Payment":"Confirmation"}
                     </span>
                   </div>
-                  {n < 3 && (
-                    <div
-                      className={`flex-1 h-1 mx-2 transition-colors duration-200 ${
-                        stepIndex > n ? "bg-amber-700" : "bg-gray-200"
-                      }`}
-                    />
-                  )}
+                  {n<3 && <div className={`flex-1 h-1 mx-2 transition-colors duration-200 ${
+                    stepIndex>n ? "bg-amber-700":"bg-gray-200"
+                  }`} />}
                 </React.Fragment>
               ))}
             </div>
@@ -265,47 +230,48 @@ export default function CheckoutPage() {
 
           {/* Card Container */}
           <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
-            {/* --- SUMMARY STEP --- */}
-            {currentStep === "summary" && (
+
+            {/* SUMMARY STEP */}
+            {currentStep==="summary" && (
               <OrderSummary
-                order={
-                  {
-                    order_id: "",
-                    created_at: new Date().toISOString(),
-                    total_amount: cartTotal,
-                    items: cartItems.map((it) => ({
-                      variant_id: it.variant_id,
-                      quantity: it.quantity,
-                      price_at_purchase: it.price,
-                      image: it.image,
-                      name: it.name,
-                      color: it.color,
-                      size: it.size,
-                    })),
-                  } as Order
-                }
+                order={{
+                  order_id:    "",
+                  created_at:  new Date().toISOString(),
+                  total_amount: cartTotal,
+                  items:       cartItems.map((it) => ({
+                    variant_id:        it.variant_id,
+                    quantity:          it.quantity,
+                    price_at_purchase: it.price,
+                    image:             it.image,
+                    name:              it.name,
+                    color:             it.color,
+                    size:              it.size,
+                  })),
+                } as Order}
                 onNext={nextStep}
               />
             )}
 
-            {/* --- PAYMENT STEP --- */}
-            {currentStep === "payment" && (
-              <PaymentForm
-                paymentDetails={paymentDetails}
-                onChange={handlePaymentChange}
-                onBack={prevStep}
-                onSubmit={submitPayment}
-                isValid={isPaymentValid()}
-                isLoading={loading}
-              />
+            {/* PAYMENT or IN‑STORE QR STEP */}
+            {currentStep==="payment" && (
+              isInStore
+                ? <InStoreQRCode orderId={order!.order_id} onComplete={nextStep} />
+                : <PaymentForm
+                    paymentDetails={paymentDetails}
+                    onChange={handlePaymentChange}
+                    onBack={prevStep}
+                    onSubmit={submitPayment}
+                    isValid={isPaymentValid()}
+                    isLoading={loading}
+                  />
             )}
 
-            {/* --- CONFIRMATION STEP --- */}
-            {currentStep === "confirmation" && order && (
+            {/* CONFIRMATION STEP */}
+            {currentStep==="confirmation" && order && (
               <ConfirmationView order={order} />
             )}
 
-            {/* ERROR MESSAGE */}
+            {/* ERROR */}
             {error && (
               <div className="text-red-500 text-center mt-4">{error}</div>
             )}

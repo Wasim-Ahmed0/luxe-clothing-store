@@ -1,11 +1,15 @@
-import { useState } from "react"
+// hooks/useCheckout.ts
+import { useRouter } from "next/router"
+import { useState, useEffect } from "react"
 import { useCart } from "@/context/cart-context"
 import type { PaymentDetails, Order } from "../types/checkout"
 
 type Step = "summary" | "payment" | "confirmation"
 
 export default function useCheckout() {
+  const router = useRouter()
   const { items: cartItems, cartTotal, clearCart } = useCart()
+
   const [currentStep, setCurrentStep] = useState<Step>("summary")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -17,19 +21,67 @@ export default function useCheckout() {
   })
   const [order, setOrder] = useState<Order | null>(null)
 
-  const nextStep = () =>
-    setCurrentStep((s) =>
-      s === "summary" ? "payment" : s === "payment" ? "confirmation" : s
-    )
+  // helper to read cookie
+  const getCartId = (): string | null => {
+    if (typeof document === "undefined") return null
+    const m = document.cookie.match(/(?:^|;\s*)cart_id=([^;]+)/)
+    return m?.[1] ?? null
+  }
+
+  // 1) Create order on Summary → Payment/QR transition
+  const createOrder = async () => {
+    const cart_id = getCartId()
+    if (!cart_id) throw new Error("No cart_id cookie")
+    const res = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cart_id }),
+    })
+    const data = await res.json()
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Failed to create order")
+    }
+    // build our Order object from cartItems + API response
+    const newOrder: Order = {
+      order_id:     data.order_id,
+      created_at:   new Date().toISOString(),
+      total_amount: cartTotal,
+      items:        cartItems.map((it) => ({
+        variant_id:        it.variant_id,
+        image:             it.image,
+        name:              it.name,
+        color:             it.color,
+        size:              it.size,
+        quantity:          it.quantity,
+        price_at_purchase: it.price,
+      })),
+    }
+    setOrder(newOrder)
+    return data.order_id
+  }
+
+  // Move next only after order exists
+  const handleNext = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      await createOrder()
+      setCurrentStep((s) =>
+        s === "summary" ? "payment" : s === "payment" ? "confirmation" : s
+      )
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const prevStep = () =>
     setCurrentStep((s) =>
       s === "confirmation" ? "payment" : s === "payment" ? "summary" : s
     )
 
-  const handlePaymentChange = (
-    field: keyof PaymentDetails,
-    value: string
-  ) => {
+  const handlePaymentChange = (field: keyof PaymentDetails, value: string) => {
     setPaymentDetails((pd) => ({ ...pd, [field]: value }))
   }
 
@@ -44,79 +96,25 @@ export default function useCheckout() {
     )
   }
 
-  // read the store_id cookie or fall back to the public env var
-  const getStoreId = (): string => {
-    if (typeof document !== "undefined") {
-      const m = document.cookie.match(/(?:^|;\s*)store_id=([^;]+)/)
-      if (m?.[1]) return m[1]
-    }
-    return process.env.NEXT_PUBLIC_DEFAULT_STORE_ID!
-  }
-
-
+  // 2) Only mark as completed here—order already exists
   const submitPayment = async () => {
+    if (!order) return
     setLoading(true)
     setError(null)
-
     try {
-      //  pull cart_id and store_id from cookies
-      const cookieMap = document.cookie
-        .split("; ")
-        .reduce<Record<string,string>>((acc, pair) => {
-          const [k,v] = pair.split("=")
-          acc[k] = v
-          return acc
-        }, {})
-      const cart_id = cookieMap["cart_id"]
-      if (!cart_id) throw new Error("No cart ID")
-
-      // 2) Create the order
-      const createRes = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart_id }),
-      })
-      const createData = await createRes.json()
-      if (!createRes.ok || !createData.success) {
-        throw new Error(createData.error || "Failed to create order")
-      }
-      const { order_id } = createData
-
-      // 3) Immediately mark it completed
-      const store_id = getStoreId();
-      const statusRes = await fetch(`/api/orders/${order_id}/status`, {
+      const cart_id = getCartId()
+      const res = await fetch(`/api/orders/${order.order_id}/status`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "completed", cart_id, store_id }),
+        body: JSON.stringify({ status: "completed", cart_id }),
       })
-      const statusData = await statusRes.json()
-      if (!statusRes.ok || !statusData.success) {
-        throw new Error(statusData.error || "Failed to complete order")
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to complete order")
       }
-
-      // 4) Clear local cart state
       clearCart()
-
-      // 5) Build an Order object for the confirmation view
-      setOrder({
-        order_id,
-        created_at: new Date().toISOString(),
-        total_amount: cartTotal,
-        items: cartItems.map((it) => ({
-          variant_id: it.variant_id,
-          image: it.image,
-          name: it.name,
-          color: it.color,
-          size: it.size,
-          quantity: it.quantity,
-          price_at_purchase: it.price,
-        })),
-      })
-
-      // 6) Advance to confirmation
-      nextStep()
+      setCurrentStep("confirmation")
     } catch (e: any) {
-      console.error(e)
       setError(e.message)
     } finally {
       setLoading(false)
@@ -130,7 +128,7 @@ export default function useCheckout() {
     error,
     paymentDetails,
     handlePaymentChange,
-    nextStep,
+    nextStep: handleNext,
     prevStep,
     submitPayment,
     isPaymentValid,
