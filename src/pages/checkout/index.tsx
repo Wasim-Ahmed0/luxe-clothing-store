@@ -177,9 +177,12 @@ import ConfirmationView from "@/components/checkout/ConfirmationView"
 import useCheckout from "../../../hooks/useCheckout"
 import { useCart } from "@/context/cart-context"
 import type { Order } from "../../../types/checkout"
+import { useSession } from "next-auth/react"
 
 export default function CheckoutPage() {
-  const router = useRouter()
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
   const { items: cartItems, cartTotal } = useCart()
   const {
     currentStep,
@@ -193,6 +196,22 @@ export default function CheckoutPage() {
     submitPayment,
     isPaymentValid,
   } = useCheckout()
+
+  // while session loading, show spinner
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-t-2 border-b-2 border-gray-900" />
+      </div>
+    )
+  }
+
+  // if unauthenticated, redirect to auth
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/auth");
+    }
+  }, [status, router]);
 
   // If they land here with an empty cart, bounce back to shop
   useEffect(() => {

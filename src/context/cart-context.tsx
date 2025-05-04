@@ -196,6 +196,8 @@ import {
   ReactNode,
 } from "react"
 
+import { useSession } from "next-auth/react"
+
 // UI‑side cart item
 export interface UICartItem {
   id: string            // cart_item_id
@@ -226,6 +228,7 @@ const CartContext = createContext<CartContextType>({} as CartContextType)
 export const useCart = () => useContext(CartContext)
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { data: session, status } = useSession();
   const [items, setItems] = useState<UICartItem[]>([])
   const [cartId, setCartId] = useState<string | null>(null)
   const [isCartOpen, setIsCartOpen] = useState(false)
@@ -275,6 +278,34 @@ export function CartProvider({ children }: { children: ReactNode }) {
         })
     }
   }, [])
+
+  // CLAIM cart once user authenticates
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.id) {
+      // instead of relying on cartId state, read it fresh from the cookie:
+      const cookieCartId = document.cookie
+        .split("; ")
+        .find((c) => c.startsWith("cart_id="))
+        ?.split("=")[1]
+
+      if (cookieCartId) {
+        console.log("Claiming cart:", cookieCartId)
+        fetch("/api/virtual-carts/claim", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cart_id: cookieCartId }),
+        })
+        .then((res) => {
+          if (!res.ok) {
+            console.error("Cart claim failed", res.status, res.statusText)
+          }
+        })
+        .catch((err) => console.error("Cart claim error", err))
+      } else {
+        console.warn("No cart_id cookie found when trying to claim cart")
+      }
+    }
+  }, [status, session?.user?.id]);
 
   // ensureCart will re-create if we had a stale ID
   const ensureCart = async (): Promise<string> => {
