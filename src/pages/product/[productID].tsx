@@ -42,8 +42,16 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
-
   const router = useRouter()
+
+  // simple helper to read a store_id cookie
+  const getCookie = (name: string): string | undefined => {
+    if (typeof document === 'undefined') return undefined
+    const match = document.cookie.match(
+      new RegExp('(^|; )' + name.replace(/([.*+?^=!:${}()|[\]\\/\\])/g, '\\$1') + '=([^;]*)')
+    )
+    return match ? decodeURIComponent(match[2]) : undefined
+  }
 
   const { addRequest } = useFittingCart()
   const [inStore, setInStore] = useState(false)
@@ -51,10 +59,18 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   useEffect(() => {
     if (!router.isReady) return
-    const { store_id } = router.query as { store_id?: string }
-    setInStore(store_id !== defaultStore)
+  
+   // First, try to get store_id from the URL
+    const raw = router.query.store_id
+    const queryStoreId =
+      Array.isArray(raw) ? raw[0] : typeof raw === 'string' ? raw : undefined
+  
+   // If no store_id in query, fall back to the cookie
+    const cookieStoreId = !queryStoreId ? getCookie('store_id') : undefined
+  
+   const storeId = queryStoreId ?? cookieStoreId
+    setInStore(!!storeId && storeId !== defaultStore)
   }, [router.isReady, router.query.store_id, defaultStore])
-
 
   const { addItem } = useCart()
   const { isInWishlist, toggleItem, loading: wLoading } = useWishlist()
@@ -84,6 +100,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     try {
       await addRequest(variantId) 
       alert("Added to fitting-room cart")
+      router.reload();
     } catch (e: any) {
       alert(e.message)
     }
@@ -275,7 +292,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                   ADD TO CART
                 </button>
 
-                {!inStore && (
+                {inStore && (
                 <button
                   onClick={handleAddToFittingCart}
                   disabled={!isComplete}

@@ -321,8 +321,6 @@
 //     );
 //   }
 
-
-// components/staff/InventoryTable.tsx
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -366,11 +364,11 @@ import { cn } from "@/lib/utils";
 export interface InventoryRow {
   inventory_id: string;
   product_name: string;
-  variant_id: string;
-  color: string;
-  size: string;
-  quantity: number;
-  status: "available" | "unavailable" | "discontinued";
+  variant_id:   string;
+  color:        string;
+  size:         string;
+  quantity:     number;
+  status:       "available" | "unavailable" | "discontinued";
   last_updated: string;
 }
 
@@ -379,22 +377,20 @@ interface Props {
 }
 
 export default function InventoryTable({ initialData }: Props) {
-  const [data, setData] = useState<InventoryRow[]>(initialData);
+  const [data, setData]           = useState<InventoryRow[]>(initialData);
   const [loadingRow, setLoadingRow] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<
     InventoryRow["status"] | "all"
   >("all");
-  const [sortField, setSortField] = useState<keyof InventoryRow>(
-    "last_updated"
-  );
+  const [sortField, setSortField]     = useState<keyof InventoryRow>("last_updated");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [syncedAt, setSyncedAt] = useState<string>("");
+  const [syncedAt, setSyncedAt]       = useState("");
+
   useEffect(() => {
     setSyncedAt(new Date().toLocaleString("en-GB"));
   }, []);
 
-  // send patch up to API
   const onUpdate = async (
     id: string,
     patch: Partial<Pick<InventoryRow, "quantity" | "status">>
@@ -416,7 +412,6 @@ export default function InventoryTable({ initialData }: Props) {
     setLoadingRow(null);
   };
 
-  // filter by any of these text fields + status
   const filtered = data.filter((r) => {
     const matchText = [
       r.product_name,
@@ -431,7 +426,6 @@ export default function InventoryTable({ initialData }: Props) {
     return matchText && matchStatus;
   });
 
-  // sort by chosen field
   const sorted = [...filtered].sort((a, b) => {
     if (sortField === "quantity") {
       return sortDirection === "asc"
@@ -441,9 +435,9 @@ export default function InventoryTable({ initialData }: Props) {
     if (sortField === "last_updated") {
       return sortDirection === "asc"
         ? new Date(a.last_updated).getTime() -
-            new Date(b.last_updated).getTime()
+          new Date(b.last_updated).getTime()
         : new Date(b.last_updated).getTime() -
-            new Date(a.last_updated).getTime();
+          new Date(a.last_updated).getTime();
     }
     const va = String(a[sortField]),
       vb = String(b[sortField]);
@@ -486,7 +480,6 @@ export default function InventoryTable({ initialData }: Props) {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Search & Status filter */}
         <div className="flex flex-col sm:flex-row sm:space-x-4 mb-4">
           <Input
             placeholder="Search by name, variant, colour or size…"
@@ -500,7 +493,7 @@ export default function InventoryTable({ initialData }: Props) {
               value={statusFilter}
               onValueChange={(v) => setStatusFilter(v as any)}
             >
-              <SelectTrigger className="w-[160px]">
+              <SelectTrigger className="w-[160px] cursor-pointer">
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
@@ -513,7 +506,6 @@ export default function InventoryTable({ initialData }: Props) {
           </div>
         </div>
 
-        {/* Table */}
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
@@ -637,7 +629,7 @@ export default function InventoryTable({ initialData }: Props) {
                         })
                       }
                     >
-                      <SelectTrigger className="w-32 mx-auto">
+                      <SelectTrigger className="w-32 mx-auto cursor-pointer">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

@@ -359,6 +359,7 @@
 // }
 // components/cart/cart-drawer.tsx
 import { useEffect, useRef } from "react"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -377,6 +378,8 @@ export default function CartDrawer() {
   } = useCart()
   const drawerRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === 'authenticated'
 
   // Lock scroll when open
   useEffect(() => {
@@ -408,13 +411,19 @@ export default function CartDrawer() {
       alert("No cart found.")
       return
     }
-    closeCart()
-    router.push({
-      pathname: "/checkout",
-      query: { cart_id },
-    })
-  }
 
+    closeCart()
+
+    if (isAuthenticated) {
+      router.push({
+        pathname: "/checkout",
+        query: { cart_id },
+      });
+    } else {
+      router.push("/auth");
+    }
+  }
+  
   return (
     <div className="fixed inset-0 z-50 block">
       {/* backdrop */}

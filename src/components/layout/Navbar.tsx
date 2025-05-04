@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useCart } from "@/context/cart-context"
 import { useWishlist } from "@/context/wishlist-context"
-import { Menu, X, ShoppingBag, User, Heart } from "lucide-react";
+import { Menu, X, ShoppingBag, User, Heart, DoorOpen } from "lucide-react";
 
 /**
  * Navbar Component
@@ -17,74 +17,76 @@ import { Menu, X, ShoppingBag, User, Heart } from "lucide-react";
  * The navbar includes:
  * - Brand logo
  * - Main navigation links
- * - Action icons (search, account, cart)
+ * - Action icons (search, account, cart, fitting room cart)
  * - Mobile menu toggle
  */
 export default function Navbar() {
-  // State to control mobile menu visibility
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-  // State to track scroll position for navbar styling
   const [isScrolled, setIsScrolled] = useState(false)
-
-  // Get cart state and functions
   const { cartCount, toggleCart } = useCart()
-
-  // Get wishlist state
   const { wishlistCount } = useWishlist()
 
-  // Effect to handle scroll events and update navbar appearance
+  const [showFittingRoomCart, setShowFittingRoomCart] = useState(false)
+  const defaultStore = process.env.NEXT_PUBLIC_DEFAULT_STORE_ID!
+
   useEffect(() => {
     const handleScroll = () => {
-      // Apply scrolled styles after scrolling 10px down
       if (window.scrollY > 10) {
         setIsScrolled(true)
       } else {
         setIsScrolled(false)
       }
     }
-
-    // Add scroll event listener
     window.addEventListener("scroll", handleScroll)
-
-    // Clean up event listener on component unmount
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  useEffect(() => {
+    const getCookie = (name: string) => {
+      const match = document.cookie.match(
+        new RegExp('(^|; )' + name.replace(/([.*+?^=!:${}()|[\]\\\/])/g, '\\$1') + '=([^;]*)')
+      )
+      return match ? decodeURIComponent(match[2]) : undefined
+    }
+    const storeIdCookie = getCookie("store_id")
+    setShowFittingRoomCart(!!storeIdCookie && storeIdCookie !== defaultStore)
+  }, [defaultStore])
+
   return (
     <>
-      {/* Main Navigation Bar */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-6 transition-all duration-300 ${
           isScrolled ? "bg-white/90 backdrop-blur-sm shadow-sm" : "bg-transparent"
         }`}
       >
         <div className="flex items-center justify-between">
-          {/* Mobile menu button - only visible on small screens */}
           <button className="md:hidden text-stone-900" onClick={() => setIsMenuOpen(true)} aria-label="Open menu">
             <Menu size={24} />
           </button>
 
-          {/* Brand Logo */}
           <Link href="/" className="text-2xl font-light tracking-widest text-stone-900">
             LUXE
           </Link>
 
-          {/* Desktop Navigation Links - hidden on mobile */}
           <div className="hidden md:flex items-center space-x-8">
-            {/* Navigation Items with hover effects */}
             <NavItem href="/shop" label="SHOP" />
             <NavItem href="/" label="ABOUT" />
             <NavItem href="/" label="CONTACT" />
           </div>
 
-          {/* Action Icons */}
           <div className="flex items-center space-x-5">
+            {showFittingRoomCart && (
+              <NavIcon
+                icon={<DoorOpen size={20} strokeWidth={2} />}
+                label="Fitting Room Cart"
+                onClick={() => (window.location.href = "/fitting-room-cart")}
+              />
+            )}
             <NavIcon 
               icon={<User size={20} strokeWidth={2} />} 
               label="Account" 
               onClick={() => (window.location.href = "/account")}
-              />
+            />
             <NavIcon
               icon={<Heart size={20} strokeWidth={2} />}
               label="Wishlist"
@@ -103,7 +105,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu - slides in from left */}
       <div
         className={`fixed inset-0 bg-white z-50 transform transition-transform duration-300 ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
@@ -137,11 +138,6 @@ export default function Navbar() {
   )
 }
 
-/**
- * NavItem Component
- *
- * Renders a navigation link with consistent styling and hover effects
- */
 function NavItem({ href, label }: { href: string; label: string }) {
   return (
     <Link
@@ -154,11 +150,6 @@ function NavItem({ href, label }: { href: string; label: string }) {
   )
 }
 
-/**
- * NavIcon Component
- *
- * Renders an icon button with consistent styling and optional badge
- */
 function NavIcon({
   icon,
   label,

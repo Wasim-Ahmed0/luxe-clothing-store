@@ -39,7 +39,7 @@ export default function AuthPage() {
     if (res?.error) {
       setError(res.error)
     } else {
-      router.push("/")
+      router.push("/shop")
     }
 
     setLoading(false)

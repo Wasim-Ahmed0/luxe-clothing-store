@@ -4,7 +4,8 @@ import { authOptions } from "../../../auth/[...nextauth]";
 import { prisma } from "../../../../../../lib/prisma";
 import { FittingRoomRequest, RequestStatus, Role } from "@/generated/prisma";
 
-type SuccessResp = {success: true; request_id: FittingRoomRequest["request_id"];status?: RequestStatus} | { success: true };
+type SuccessResp = {success: true; request_id: FittingRoomRequest["request_id"]; status?: RequestStatus; fitting_room_id?: string} 
+    | { success: true };
 type ErrorResp = { success: false; error: string };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<SuccessResp | ErrorResp>) {
@@ -14,45 +15,81 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     }
 
     if (req.method === "PUT") {
-        const { status } = req.body as { status?: string };
-        if (status !== "fulfilled" && status !== "cancelled") {
-            return res.status(400).json({ success: false, error: "Invalid status" });
+        const { status, fitting_room_id } = req.body as {
+            status?: string
+            fitting_room_id?: string
+        }
+      
+        // must send at least one of them
+        if (
+            status !== undefined &&
+            status !== "fulfilled" &&
+            status !== "cancelled"
+        ) {
+            return res.status(400).json({ success: false, error: "Invalid status" })
+        }
+        if (status === undefined && fitting_room_id === undefined) {
+            return res.status(400).json({ success: false, error: "Must provide status or fitting_room_id" })
         }
     
-        // load session + original request
-        const session = await getServerSession(req, res, authOptions);
-        const reqRow  = await prisma.fittingRoomRequest.findUnique({
+        // fetch original
+        const session = await getServerSession(req, res, authOptions)
+        const existing = await prisma.fittingRoomRequest.findUnique({
             where: { request_id: requestID },
-        });
+        })
         
-        if (!reqRow) {
-            return res.status(404).json({ success: false, error: "Request not found" });
+        if (!existing) {
+            return res.status(404).json({ success: false, error: "Request not found" })
         }
     
-        // authorization
-        if (status === "fulfilled") {
-            if (session?.user?.role !== Role.employee) {
-                return res.status(403).json({ success: false, error: "Forbidden" });
-            }
-        } else {
-            if (reqRow.user_id) {
-                // only original signed-in customer may cancel
-                if (session?.user?.id !== reqRow.user_id) {
-                    return res.status(403).json({ success: false, error: "Forbidden" });
+        // Authorization for status changes
+        if (status) {
+            if (status === "fulfilled") {
+                if (
+                    session?.user?.role !== Role.employee &&
+                    session?.user?.role !== Role.store_manager
+                ) {
+                    return res.status(403).json({ success: false, error: "Forbidden" })
+                }
+            } else {
+                // cancelled by customer only
+                if (existing.user_id) {
+                    if (session?.user?.id !== existing.user_id) {
+                        return res.status(403).json({ success: false, error: "Forbidden" })
+                    }
                 }
             }
-            // otherwise guest request passes
         }
     
-        // perform update
+        // Authorization for room assignments
+        if (fitting_room_id !== undefined) {
+            if (
+                session?.user?.role !== Role.employee &&
+                session?.user?.role !== Role.store_manager
+            ) {
+                return res.status(403).json({ success: false, error: "Forbidden" })
+            }
+        }
+    
+        // Build the update payload
+        const data: Record<string, any> = {}
+        if (status) data.status = status
+        if (fitting_room_id !== undefined) data.fitting_room_id = fitting_room_id
+    
         try {
             const updated = await prisma.fittingRoomRequest.update({
                 where: { request_id: requestID },
-                data: { status },
-            });
-            return res.status(200).json({ success: true, request_id: updated.request_id, status: updated.status });
-        } catch {
-            return res.status(500).json({ success: false, error: "Failed to update request status" });
+                data,
+            })
+            
+            return res.status(200).json({
+                success: true,
+                request_id: updated.request_id,
+                status: updated.status,
+                fitting_room_id: updated.fitting_room_id ?? undefined,
+            })
+        } catch (err) {
+            return res.status(500).json({ success: false, error: "Failed to update request" })
         }
     } else if (req.method === "DELETE") {
         const session = await getServerSession(req, res, authOptions);
