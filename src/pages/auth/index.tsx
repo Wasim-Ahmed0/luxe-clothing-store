@@ -6,6 +6,9 @@ import { signIn } from "next-auth/react"
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react"
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { getServerSession } from "next-auth/next"
+import type { GetServerSideProps } from "next"
+import { authOptions } from "../api/auth/[...nextauth]"
 
 import formImg from "../../../public/images/vintage man asset.jpg"
 
@@ -281,4 +284,13 @@ export default function AuthPage() {
       <Footer />
     </>
   )
+}
+
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const session = await getServerSession(ctx.req, ctx.res, authOptions)
+  if (session) {
+    return { redirect: { destination: "/", permanent: false } }
+  }
+  return { props: {} }
 }
