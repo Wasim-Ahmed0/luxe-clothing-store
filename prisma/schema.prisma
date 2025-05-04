@@ -127,7 +127,7 @@ model FittingRoomRequest {
   fitting_cart_id String
   user_id         String?
   store_id        String
-  fitting_room_id String
+  fitting_room_id String?
   variant_id      String
   status          RequestStatus @default(pending)
   created_at      DateTime      @default(now())

@@ -40,8 +40,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     };
     
     // Validate Payload
-    if (!fitting_room_id || !variant_id) {
-        return res.status(400).json({ success: false, error: "fitting_room_id & variant_id are required" });
+    if (!variant_id) {
+        return res.status(400).json({ success: false, error: "variant_id is required" });
     }
 
     // Add Try-On Request

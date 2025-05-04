@@ -188,6 +188,8 @@
 
 // context/cart-context.tsx
 // context/cart-context.tsx
+// context/cart-context.tsx
+// context/cart-context.tsx
 import {
   createContext,
   useContext,
@@ -195,10 +197,9 @@ import {
   useState,
   ReactNode,
 } from "react"
-
+import { useRouter } from "next/router"
 import { useSession } from "next-auth/react"
 
-// UI‑side cart item
 export interface UICartItem {
   id: string            // cart_item_id
   variant_id: string
@@ -228,12 +229,13 @@ const CartContext = createContext<CartContextType>({} as CartContextType)
 export const useCart = () => useContext(CartContext)
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { data: session, status } = useSession();
+  const router = useRouter()
+  const { data: session, status } = useSession()
+
   const [items, setItems] = useState<UICartItem[]>([])
   const [cartId, setCartId] = useState<string | null>(null)
   const [isCartOpen, setIsCartOpen] = useState(false)
 
-  // read store_id cookie or fallback
   const getStoreId = (): string => {
     if (typeof document !== "undefined") {
       const m = document.cookie.match(/(?:^|;\s*)store_id=([^;]+)/)
@@ -242,87 +244,82 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return process.env.NEXT_PUBLIC_DEFAULT_STORE_ID!
   }
 
-  // on mount, load existing cart_id & items
+  // fetch + hydrate
+  const fetchCartItems = async (id: string) => {
+    try {
+      const res = await fetch(`/api/virtual-carts/${id}`)
+      if (!res.ok) throw new Error("Cart not found")
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error || "Fetch failed")
+      setItems(
+        data.cart.items.map((i: any) => ({
+          id: i.cart_item_id,
+          variant_id: i.variant.variant_id,
+          quantity: i.quantity,
+          price: i.price_at_time,
+          name: i.variant.product.name,
+          image: "",
+          color: i.variant.color,
+          size: i.variant.size,
+        }))
+      )
+    } catch {
+      // stale cart
+      document.cookie = `cart_id=;path=/;max-age=0`
+      setCartId(null)
+      setItems([])
+    }
+  }
+
+  // 1) on mount, seed cartId from cookie (no fetch yet)
   useEffect(() => {
     if (typeof document === "undefined") return
     const m = document.cookie.match(/(?:^|;\s*)cart_id=([^;]+)/)
-    if (m?.[1]) {
-      const existing = m[1]
-      setCartId(existing)
-      fetch(`/api/virtual-carts/${existing}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("Cart not found")
-          return res.json()
-        })
-        .then((data) => {
-          if (data.success) {
-            setItems(
-              data.cart.items.map((i: any) => ({
-                id: i.cart_item_id,
-                variant_id: i.variant.variant_id,
-                quantity: i.quantity,
-                price: i.price_at_time,
-                name: i.variant.product.name,
-                image: "",
-                color: i.variant.color,
-                size: i.variant.size,
-              }))
-            )
-          }
-        })
-        .catch(() => {
-          // stale cart: clear cookie & state
-          document.cookie = `cart_id=;path=/;max-age=0`
-          setCartId(null)
-          setItems([])
-        })
-    }
+    if (m?.[1]) setCartId(m[1])
   }, [])
 
-  // CLAIM cart once user authenticates
+  // 2) on every page navigation, re-read cookie and re-fetch
+  useEffect(() => {
+    if (typeof document === "undefined") return
+    const m = document.cookie.match(/(?:^|;\s*)cart_id=([^;]+)/)
+    const existing = m?.[1] ?? null
+
+    if (existing) {
+      setCartId(existing)
+      fetchCartItems(existing)
+    } else {
+      // no cookie → clear
+      setCartId(null)
+      setItems([])
+    }
+  }, [router.asPath])
+
+  // 3) claim on login
   useEffect(() => {
     if (status === "authenticated" && session?.user?.id) {
-      // instead of relying on cartId state, read it fresh from the cookie:
       const cookieCartId = document.cookie
         .split("; ")
         .find((c) => c.startsWith("cart_id="))
         ?.split("=")[1]
-
       if (cookieCartId) {
-        console.log("Claiming cart:", cookieCartId)
         fetch("/api/virtual-carts/claim", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ cart_id: cookieCartId }),
-        })
-        .then((res) => {
-          if (!res.ok) {
-            console.error("Cart claim failed", res.status, res.statusText)
-          }
-        })
-        .catch((err) => console.error("Cart claim error", err))
-      } else {
-        console.warn("No cart_id cookie found when trying to claim cart")
+        }).catch(console.error)
       }
     }
-  }, [status, session?.user?.id]);
+  }, [status, session?.user?.id])
 
-  // ensureCart will re-create if we had a stale ID
   const ensureCart = async (): Promise<string> => {
-    // if we think we have one, verify it
     if (cartId) {
       const res = await fetch(`/api/virtual-carts/${cartId}`)
-      if (!res.ok) {
-        // stale: clear
-        document.cookie = `cart_id=;path=/;max-age=0`
-        setCartId(null)
-        setItems([])
-      } else {
-        return cartId
-      }
+      if (res.ok) return cartId
+      // otherwise stale
+      document.cookie = `cart_id=;path=/;max-age=0`
+      setCartId(null)
+      setItems([])
     }
-
-    // no valid cart, create a new one
     const store_id = getStoreId()
     const createRes = await fetch("/api/virtual-carts", {
       method: "POST",
@@ -332,8 +329,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const createData = await createRes.json()
     if (!createData.success) throw new Error("Cart creation failed")
     const newId = createData.cart.cart_id
-    setCartId(newId)
     document.cookie = `cart_id=${newId};path=/;max-age=${60 * 60 * 24}`
+    setCartId(newId)
     return newId
   }
 

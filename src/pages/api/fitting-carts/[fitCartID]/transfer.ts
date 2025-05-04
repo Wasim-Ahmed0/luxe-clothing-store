@@ -78,6 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             const alreadyInCart = await prisma.cartItem.findFirst({
                 where: {
                     cart_id: vCart!.cart_id,
+                    variant_id,
                 },
             });
 

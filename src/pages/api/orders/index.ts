@@ -38,8 +38,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(404).json({ success: false, error: "Cart not found" });
     }
 
-    console.log(cart.user_id)
-
     // Only allowing authenticated customer to pass through checkout
     if (cart.user_id !== userID) {
         return res.status(403).json({ success: false, error: "Forbidden" });

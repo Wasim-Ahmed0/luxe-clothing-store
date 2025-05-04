@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../../auth/[...nextauth]";
-import { prisma } from "../../../../../lib/prisma";
+import { authOptions } from "../../../auth/[...nextauth]";
+import { prisma } from "../../../../../../lib/prisma";
 import { FittingRoomRequest, RequestStatus, Role } from "@/generated/prisma";
 
 type SuccessResp = {success: true; request_id: FittingRoomRequest["request_id"];status?: RequestStatus} | { success: true };

@@ -69,7 +69,7 @@
 // export default ConfirmationView;
 
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Order } from '../../../types/checkout'
 import { formatCurrency, formatDate } from '../../../utils/formatter'
 import { CheckCircle2 } from 'lucide-react'
@@ -79,6 +79,12 @@ interface ConfirmationViewProps {
 }
 
 const ConfirmationView: React.FC<ConfirmationViewProps> = ({ order }) => {
+  useEffect(() => {
+    // clear out residual cookies
+    document.cookie = 'cart_id=; path=/; max-age=0'
+    document.cookie = 'store_id=; path=/; max-age=0'
+  }, []);
+  
   return (
     <div className="w-full animate-fadeIn text-center">
       <div className="mb-6 flex flex-col items-center">

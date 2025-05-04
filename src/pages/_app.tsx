@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
 import { CartProvider } from "@/context/cart-context"
 import { WishlistProvider } from "@/context/wishlist-context"
+import { FittingCartProvider } from '@/context/fitting-cart-context'
 import "@/styles/globals.css";
 
 export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
@@ -21,7 +22,9 @@ export default function App({ Component, pageProps: { session, ...pageProps } }:
     	<SessionProvider session={session}>
 			<CartProvider>
 				<WishlistProvider>
-      				<Component {...pageProps} />
+					<FittingCartProvider>
+      					<Component {...pageProps} />
+					</FittingCartProvider>
 				</WishlistProvider>
 			</CartProvider>
     	</SessionProvider>
