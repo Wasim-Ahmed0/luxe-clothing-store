@@ -1,4 +1,3 @@
-// components/checkout/PaymentForm.tsx
 import React, { useState } from 'react';
 import { PaymentDetails } from '../../../types/checkout';
 import { CreditCard, ArrowLeft } from 'lucide-react';

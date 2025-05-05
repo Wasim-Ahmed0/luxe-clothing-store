@@ -1,4 +1,3 @@
-// components/checkout/InStoreQRCode.tsx
 import React, { useEffect, useState } from "react"
 import { QRCodeSVG } from 'qrcode.react';
 import { formatCurrency } from "../../../utils/formatter"

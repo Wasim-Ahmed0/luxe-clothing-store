@@ -1,4 +1,3 @@
-// src/context/wishlist-context.tsx
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useSession } from "next-auth/react";
 
