@@ -12,8 +12,6 @@ import { useWishlist } from "@/context/wishlist-context"
 import productImages from "@/lib/product-images"
 import { useFittingCart } from '@/context/fitting-cart-context'
 import { useRouter } from "next/router"
-
-import cookie from "cookie"
 import { prisma } from "../../../lib/prisma"
 
 interface Variant {
@@ -318,7 +316,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
 export const getServerSideProps: GetServerSideProps = async ({ params, req }) => {
   const productID = params?.productID as string
-  const cookies   = cookie.parse(req.headers.cookie || "")
+  const cookies = req.cookies as Record<string,string>
   const store_id  = cookies.store_id || process.env.NEXT_PUBLIC_DEFAULT_STORE_ID!
 
   // fetch product + stock
