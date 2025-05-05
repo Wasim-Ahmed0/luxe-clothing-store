@@ -160,27 +160,27 @@ export default function Home() {
 //
 // Server-side redirect for staff users
 //
-import { GetServerSideProps } from "next"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "../pages/api/auth/[...nextauth]"
+// import { GetServerSideProps } from "next"
+// import { getServerSession } from "next-auth/next"
+// import { authOptions } from "../pages/api/auth/[...nextauth]"
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const session = await getServerSession(ctx.req, ctx.res, authOptions)
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   const session = await getServerSession(ctx.req, ctx.res, authOptions)
 
-  // If logged in as employee OR store_manager, send them to the staff dashboard
-  if (
-    session &&
-    (session.user.role === "employee" ||
-      session.user.role === "store_manager")
-  ) {
-    return {
-      redirect: {
-        destination: "/staff/dashboard",
-        permanent: false,
-      },
-    }
-  }
+//   // If logged in as employee OR store_manager, send them to the staff dashboard
+//   if (
+//     session &&
+//     (session.user.role === "employee" ||
+//       session.user.role === "store_manager")
+//   ) {
+//     return {
+//       redirect: {
+//         destination: "/staff/dashboard",
+//         permanent: false,
+//       },
+//     }
+//   }
 
-  // Otherwise, render the public Home page
-  return { props: {} }
-}
+//   // Otherwise, render the public Home page
+//   return { props: {} }
+// }
