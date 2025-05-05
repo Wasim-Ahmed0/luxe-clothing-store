@@ -9,7 +9,7 @@ interface Variant {
 }
 
 export default function WishlistSection() {
-  const { items: raw, removeItem } = useWishlist()
+  const { removeItem } = useWishlist()
   const [list, setList] = useState<Variant[]>([])
   const [loading, setLoading] = useState(true)
 

@@ -1,4 +1,4 @@
-import { FC, ReactNode } from "react"
+import { FC } from "react"
 import OrdersSection from "./OrdersSection"
 import ProfileSection from "./ProfileSection"
 import WishlistSection from "./WishlistSection"

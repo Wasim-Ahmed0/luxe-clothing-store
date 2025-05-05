@@ -19,7 +19,7 @@ export default function CartDrawer() {
   } = useCart()
   const drawerRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const isAuthenticated = status === 'authenticated'
 
   // Lock scroll when open
