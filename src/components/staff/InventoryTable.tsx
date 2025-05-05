@@ -1,41 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableHeader,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table";
-import {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-import {
-  PackageSearch,
-  Filter as FilterIcon,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
-  AlertCircle,
-} from "lucide-react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem} from "@/components/ui/select";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell} from "@/components/ui/table";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { PackageSearch, Filter as FilterIcon, ArrowUpDown, ChevronUp, ChevronDown, AlertCircle } from "lucide-react";
+import AddInventoryItem from "@/components/staff/AddInventoryItem";
 import { cn } from "@/lib/utils";
 
 export interface InventoryRow {
@@ -154,6 +125,7 @@ export default function InventoryTable({ initialData }: Props) {
           <div className="text-sm text-muted-foreground">
             {syncedAt && `Synced ${syncedAt}`}
           </div>
+          <AddInventoryItem />
         </div>
       </CardHeader>
       <CardContent>
