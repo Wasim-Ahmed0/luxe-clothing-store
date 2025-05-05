@@ -225,17 +225,17 @@ export default function FittingRequestsTable({ initialData }: Props) {
   return (
     <Card className="shadow-sm">
       <CardHeader>
-        <CardTitle>Fitting Room Requests</CardTitle>
+        <CardTitle className='text-lg'>Fitting Room Requests</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Request ID</TableHead>
-              <TableHead>Variant</TableHead>
-              <TableHead>Room</TableHead>
-              <TableHead>Requested At</TableHead>
-              <TableHead>Action</TableHead>
+              <TableHead className='font-semibold text-stone-800'>Request ID</TableHead>
+              <TableHead className='font-semibold text-stone-800'>Variant</TableHead>
+              <TableHead className='font-semibold text-stone-800'>Room</TableHead>
+              <TableHead className='font-semibold text-stone-800'>Requested At</TableHead>
+              <TableHead className='font-semibold text-stone-800'>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
