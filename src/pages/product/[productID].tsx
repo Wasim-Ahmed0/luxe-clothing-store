@@ -1,4 +1,3 @@
-// pages/product/[productID].tsx
 import { useState, useEffect } from "react"
 import Head from "next/head"
 import Image from "next/image"
@@ -10,7 +9,7 @@ import Footer from "@/components/layout/Footer"
 import CartDrawer from "@/components/cart/cart-drawer"
 import { useCart } from "@/context/cart-context"
 import { useWishlist } from "@/context/wishlist-context"
-import suitImg from "../../../public/images/Savile Row Suit.png"
+import productImages from "@/lib/product-images"
 
 import { useFittingCart } from '@/context/fitting-cart-context'
 import { useRouter } from "next/router"
@@ -148,7 +147,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             <div className="lg:w-3/5">
               <div className="aspect-[4/5] bg-stone-200 relative">
                 <Image
-                  src={suitImg}
+                  src={productImages[product.name]}
                   alt={product.name}
                   fill
                   className="object-cover"

@@ -1,4 +1,3 @@
-// pages/wishlist.tsx
 import { useState, useCallback } from "react"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
@@ -10,6 +9,7 @@ import Footer from "@/components/layout/Footer"
 import CartDrawer from "@/components/cart/cart-drawer"
 import { useWishlist } from "@/context/wishlist-context"
 import { useCart } from "@/context/cart-context"
+import productImages from "@/lib/product-images"
 
 export default function WishlistPage() {
   const router = useRouter()
@@ -119,10 +119,10 @@ export default function WishlistPage() {
                   {/* Remove button */}
                   <button
                     onClick={() => removeItem(item.variantId)}
-                    className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-white bg-opacity-80 rounded-full text-stone-500 hover:text-stone-700 transition-colors z-10 cursor-pointer"
+                    className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-white bg-opacity-80 rounded-full text-stone-500 hover:text-stone-700 transition-colors z-10 cursor-pointer"
                     aria-label="Remove from wishlist"
                   >
-                    <X size={18} />
+                    <X size={20} />
                   </button>
 
                   {/* Product image */}
@@ -131,7 +131,7 @@ export default function WishlistPage() {
                     className="block relative aspect-[3/4] mb-4 overflow-hidden"
                   >
                     <Image
-                      src={"/placeholder.svg"}
+                      src={productImages[item.name]}
                       alt={item.name}
                       fill
                       className="object-cover transition-transform duration-700 hover:scale-105"

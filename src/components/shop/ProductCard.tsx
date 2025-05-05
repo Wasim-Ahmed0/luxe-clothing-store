@@ -1,9 +1,7 @@
 import { useState } from "react";
-import Link from "next/link"
-import Image from "next/image"
-import { Heart } from "lucide-react"
-
-import suitImg from "../../../public/images/Savile Row Suit.png";
+import Link from "next/link";
+import Image from "next/image";
+import productImages from "@/lib/product-images";
 
 interface Product {
   product_id: string
@@ -14,21 +12,21 @@ interface Product {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-  const [isHovered, setIsHovered] = useState(false)
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <Link
       href={`/product/${product.product_id}`}
-      className="group block"      // make the link fill its container
+      className="group block"
     >
       <div
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="cursor-pointer"  // make sure pointer shows
+        className="cursor-pointer"
       >
         <div className="relative aspect-[3/4] mb-4 overflow-hidden bg-stone-100">
           <Image
-            src={ suitImg }
+            src={productImages[product.name]}
             alt={product.name}
             fill
             className={`object-cover transition-transform duration-700 ${

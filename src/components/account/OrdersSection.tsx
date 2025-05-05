@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react"
+import Image from "next/image"
+import productImages from "@/lib/product-images"
 
 interface OrderItem {
   variant_id: string
@@ -93,13 +95,18 @@ export default function OrdersSection() {
 
           <div className="space-y-2">
             {o.details.map((item, i) => (
-              <div
-                key={i}
-                className="flex justify-between text-sm font-medium text-stone-900"
-              >
-                <span>
-                  {item.name} × {item.quantity}
-                </span>
+              <div key={i} className="flex items-center justify-between gap-4 text-sm font-medium text-stone-900">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-10 h-10 rounded overflow-hidden bg-gray-100 flex-shrink-0">
+                    <Image
+                      src={productImages[item.name!]}
+                      alt={item.name!}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <span>{item.name} × {item.quantity}</span>
+                </div>
                 <span>£{item.price_at_purchase.toFixed(2)}</span>
               </div>
             ))}

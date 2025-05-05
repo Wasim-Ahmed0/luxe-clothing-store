@@ -1,140 +1,11 @@
-// // pages/fitting-room-cart.tsx
-// import { useEffect, useState } from "react"
-// import { Trash2 } from "lucide-react";
-// import { useRouter } from "next/router"
-// import Navbar from "@/components/layout/Navbar"
-// import Footer from "@/components/layout/Footer"
-// import { useFittingCart, FitRequest } from "@/context/fitting-cart-context"
-
-// interface EnrichedRequest extends FitRequest {
-//   name: string
-//   size: string
-//   color: string
-//   image: string
-// }
-
-// const PLACEHOLDER_IMAGE = "/placeholder.svg"  // ← your hard-coded placeholder
-
-// const getStoreId = (): string => {
-//   if (typeof document !== "undefined") {
-//     const m = document.cookie.match(/(?:^|;\s*)store_id=([^;]+)/)
-//     if (m?.[1]) return m[1]
-//   }
-//   return process.env.NEXT_PUBLIC_DEFAULT_STORE_ID!
-// }
-
-// export default function FittingRoomCartPage() {
-//   const router = useRouter()
-//   const { fitCartId, requests, transferToCart } = useFittingCart()
-//   const [enriched, setEnriched] = useState<EnrichedRequest[]>([])
-//   const defaultStore = process.env.NEXT_PUBLIC_DEFAULT_STORE_ID!
-//   const sid = getStoreId()
-
-//   // Redirect away if not in-store
-//   useEffect(() => {
-//     if (sid === defaultStore) {
-//       router.replace("/shop")
-//     }
-//   }, [sid, router])
-
-//   // Whenever requests update, look up product details
-//   useEffect(() => {
-//     if (!requests.length) {
-//       setEnriched([])
-//       return
-//     }
-
-//     Promise.all(
-//       requests.map(async (r) => {
-//         const resp = await fetch(`/api/products?variantID=${r.variant_id}`)
-//         const j = await resp.json()
-//         if (!j.success) throw new Error(j.error || "Lookup failed")
-
-//         const p = (j as any).product
-//         return {
-//           ...r,
-//           name: p.name,
-//           size: p.variant.size,
-//           color: p.variant.color,
-//           image: PLACEHOLDER_IMAGE,   // ← always use the placeholder
-//         } as EnrichedRequest
-//       })
-//     )
-//       .then(setEnriched)
-//       .catch(console.error)
-//   }, [requests])
-
-//   const handleTransfer = async () => {
-//     try {
-//       const newCartId = await transferToCart()
-//       router.push(`/checkout?cart_id=${newCartId}&store_id=${sid}`)
-//     } catch (err: any) {
-//       alert(err.message)
-//     }
-//   }
-
-//   return (
-//     <>
-//       <Navbar />
-//       <main className="min-h-screen py-24 px-4 bg-stone-50">
-//         <div className="max-w-xl mx-auto bg-white rounded-lg shadow p-6">
-//           <h1 className="text-3xl font-light mb-6 tracking-wider text-stone-900">Fitting-Room Cart</h1>
-//           {enriched.length === 0 ? (
-//             <p className="text-stone-600">You haven’t added any items yet.</p>
-//           ) : (
-//             <ul className="divide-y">
-//               {enriched.map((r) => (
-//                 <li
-//                   key={r.request_id}
-//                   className="py-4 flex items-center gap-4"
-//                 >
-//                   <img
-//                     src={r.image}
-//                     alt={r.name}
-//                     className="w-16 h-16 object-cover rounded"
-//                   />
-//                   <div className="flex-1 text-left">
-//                     <h2 className=" font-medium text-lg text-stone-900 ">{r.name}</h2>
-//                     <p className="text-xs text-amber-900">
-//                       Size: {r.size}
-//                       {r.color && ` • ${r.color}`}
-//                     </p>
-//                   </div>
-//                   <Trash2 
-//                     size={20} 
-//                     className="mr-2 text-red-700 transition-colors transition-transform duration-200 
-//                       ease-in-out transform hover:text-red-800 hover:-translate-y-1 hover:scale-110" 
-//                   />
-//                 </li>
-//               ))}
-//             </ul>
-//           )}
-
-//           <button
-//             onClick={handleTransfer}
-//             disabled={enriched.length === 0}
-//             className={`mt-6 w-full py-2 rounded text-white ${
-//               enriched.length
-//                 ? "bg-amber-800 hover:bg-amber-700"
-//                 : "bg-gray-300 cursor-not-allowed"
-//             }`}
-//           >
-//             Transfer to Cart & Checkout
-//           </button>
-//         </div>
-//       </main>
-//       <Footer />
-//     </>
-//   )
-// }
-
-
 import { useEffect, useState } from "react"
 import { Trash2 } from "lucide-react"
 import { useRouter } from "next/router"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { useFittingCart, FitRequest } from "@/context/fitting-cart-context"
+import Image from "next/image"
+import productImages from "@/lib/product-images"
 
 interface EnrichedRequest extends FitRequest {
   name: string
@@ -230,11 +101,14 @@ export default function FittingRoomCartPage() {
                   key={r.request_id}
                   className="py-4 flex items-center gap-4"
                 >
-                  <img
-                    src={r.image}
-                    alt={r.name}
-                    className="w-16 h-16 object-cover rounded"
-                  />
+                  <div className="w-16 h-16 relative rounded overflow-hidden flex-shrink-0 bg-gray-100">
+                    <Image
+                      src={productImages[r.name]}
+                      alt={r.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                   <div className="flex-1 text-left">
                     <h2 className="font-medium text-lg text-stone-900">
                       {r.name}
