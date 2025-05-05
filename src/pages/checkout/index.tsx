@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter }        from "next/router";
-import "../../../styles/animations.css";
+import "../../../styles/animations.module.css";
 
 import Navbar           from "@/components/layout/Navbar"
 import Footer           from "@/components/layout/Footer"
