@@ -84,7 +84,7 @@ export default function StaffDashboard({
           </div>
 
           {tab === 'inventory' && isManager && (
-            <InventoryTable initialData={initialInventory} />
+            <InventoryTable storeId={storeId} initialData={initialInventory} />
           )}
 
           {tab === 'requests' && (
