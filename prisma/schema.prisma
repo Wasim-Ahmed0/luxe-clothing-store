@@ -23,7 +23,6 @@ model Store {
   inventory       Inventory[]
   orders          Order[]
   fittingCarts    FittingCart[]
-  analytics       Analytics[]
   virtualCarts    VirtualCart[]
   fittingRequests FittingRoomRequest[]
 }
@@ -43,7 +42,6 @@ model User {
   fittingCarts    FittingCart[]
   orders          Order[]
   wishlists       Wishlist[]
-  analytics       Analytics[]
   fittingRequests FittingRoomRequest[]
 }
 
@@ -69,7 +67,6 @@ model ProductVariant {
   cartItems       CartItem[]
   orderDetails    OrderDetail[]
   wishlistItems   WishlistItem[]
-  analytics       Analytics[]
   fittingRequests FittingRoomRequest[] @relation("VariantRequests")
 }
 
@@ -180,19 +177,6 @@ model WishlistItem {
   variant  ProductVariant @relation(fields: [variant_id], references: [variant_id])
 }
 
-model Analytics {
-  analytics_id String    @id @default(uuid())
-  event_type   EventType
-  variant_id   String?
-  user_id      String?
-  store_id     String?
-  timestamp    DateTime  @default(now())
-  weight       Float?
-
-  variant ProductVariant? @relation(fields: [variant_id], references: [variant_id])
-  user    User?           @relation(fields: [user_id], references: [user_id])
-  store   Store?          @relation(fields: [store_id], references: [store_id])
-}
 
 // Enums
 enum Role {
@@ -217,11 +201,4 @@ enum OrderStatus {
   pending
   completed
   cancelled
-}
-
-enum EventType {
-  NFC_scan
-  add_to_cart
-  purchase
-  checkout
 }
