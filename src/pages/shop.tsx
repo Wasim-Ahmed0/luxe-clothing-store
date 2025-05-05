@@ -56,9 +56,20 @@ export default function ShopPage() {
 
       try {
         const storeId = getStoreId()
-        const res = await fetch(
-          `/api/products?store_id=${storeId}&sort=${filters.sort === "price-asc" ? "price_asc" : filters.sort === "price-desc" ? "price_desc" : ""}`
-        )
+
+        // include inStock=true to filter out of stock variants
+        const params = new URLSearchParams({
+          store_id: storeId,
+          sort:
+            filters.sort === "price-asc"
+              ? "price_asc"
+              : filters.sort === "price-desc"
+              ? "price_desc"
+              : "",
+          inStock: "true",
+        })        
+
+        const res = await fetch(`/api/products?${params.toString()}`)
         const data = await res.json()
         if (!data.success || !Array.isArray(data.products)) {
           throw new Error("Invalid products response")

@@ -22,6 +22,7 @@
     "argon2": "^0.41.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cookie": "^1.0.2",
     "eslint": "^8.57.1",
     "gsap": "^3.13.0",
     "lucide-react": "^0.506.0",

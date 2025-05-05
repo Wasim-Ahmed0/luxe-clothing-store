@@ -1,4 +1,3 @@
-import { useRouter } from "next/router"
 import { useState } from "react"
 import { useCart } from "@/context/cart-context"
 import type { PaymentDetails, Order } from "../types/checkout"

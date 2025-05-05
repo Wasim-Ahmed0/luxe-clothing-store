@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next"
 import { prisma } from "../../../../lib/prisma"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "../auth/[...nextauth]"
 
 type VariantLookupResp = {
   success: true
@@ -39,19 +37,16 @@ export default async function handler(
     return res.status(405).json({ success: false, error: "Method Not Allowed" })
   }
 
-  const { variantID, category, minPrice, maxPrice, color, sort, store_id } =
-    req.query
+  const { variantID, category, minPrice, maxPrice, color, sort, store_id, inStock } = req.query
 
-  // 1) If variantID passed, do a lookup and return single product+variant
+  // If variantID passed, do a lookup and return single product+variant
   if (typeof variantID === "string") {
     const variant = await prisma.productVariant.findUnique({
       where: { variant_id: variantID },
       include: { product: true },
     })
     if (!variant) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Variant not found" })
+      return res.status(404).json({ success: false, error: "Variant not found" })
     }
 
     // ← destructure the camel-cased field
@@ -85,7 +80,18 @@ export default async function handler(
   if (color) {
     filters.variants = { some: { color: color as string } }
   }
-  if (store_id) {
+  // if inStock=true, only include variants with available stock > 0 
+  const wantInStock = inStock === "true"
+  if (wantInStock && store_id) {
+    filters.inventory = {
+      some: {
+        store_id: store_id as string,
+        quantity: { gt: 0 },
+        status: "available",
+      },
+    }
+  } else if (store_id) {
+    // fallback to existing behavior: any record at this store
     filters.inventory = { some: { store_id: store_id as string } }
   }
 
@@ -107,8 +113,6 @@ export default async function handler(
     })
     return res.status(200).json({ success: true, products })
   } catch (err: any) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Failed to fetch products" })
+    return res.status(500).json({ success: false, error: "Failed to fetch products" })
   }
 }
