@@ -15,19 +15,20 @@ type CartRow = {
 type ResponseData = { success: true; cart: CartRow } | { success: false; error: string };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
+    // Only accept POST requests
     if (req.method !== "POST") {
       res.setHeader("Allow", "POST");
       return res.status(405).json({ success: false, error: "Method Not Allowed" });
     }
 
-    // Authenticate Customer / Guest
+    // Authenticate as customer (or guest)
     let userID: string | null = null;
     const session = await getServerSession(req, res, authOptions);
     if (session?.user?.id && session.user.role === Role.customer) {
         userID = session.user.id;
     }
     
-    // Validate input
+    // Validate and check store_id
     const { store_id } = req.body as { store_id?: string };
     if (!store_id) {
         return res.status(400).json({ success: false, error: "Missing store_id" });
@@ -37,36 +38,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         return res.status(404).json({ success: false, error: "Store Not Found" });
     }
 
-    // Cart 2hr expiry
+    // Compute 2-hour expiration
     const now = new Date();
     const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
 
     let cart;
 
-    // If authenticated customer -> use existing cart + delay expiry time
+    // Attempt to find existing non-expired cart for authenticated user
     if (userID) {
         cart = await prisma.virtualCart.findFirst({
             where: {
                 user_id: userID,
                 store_id: store_id,
-                expires_at: {gt: now},
+                expires_at: { gt: now },
             }
         });
     }
 
-    // Create new cart (guests / user (if no active cart already))
+    // Create new cart if none found (guest or user)
     if (!cart) {
         cart = await prisma.virtualCart.create({
             data: {
-                // only connect user if we have one
-                ...(userID ? { user: { connect: { user_id: userID } } }: {}),
+                // link user if available
+                ...(userID ? { user: { connect: { user_id: userID } } } : {}),
+                // always link store
                 store: { connect: { store_id } },
                 expires_at: twoHoursLater,
             },
         });
     }
 
-    // Return cart object 
+    // Respond with cart details
     return res.status(201).json({
         success: true,
         cart: {
@@ -77,4 +79,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             expires_at: cart.expires_at,
         },
     });
-}   
+}

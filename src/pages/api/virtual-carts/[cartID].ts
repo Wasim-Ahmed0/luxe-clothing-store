@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 import { prisma } from "../../../../lib/prisma";
-import { VirtualCart, CartItem, ProductVariant, Product, Role } from "@/generated/prisma";
+import { VirtualCart, CartItem, ProductVariant, Product } from "@/generated/prisma";
 
 type CartItemResp = {
     cart_item_id: CartItem["cart_item_id"];
@@ -34,21 +34,23 @@ type SuccessResp = {
 type ErrorResp = { success: false; error: string };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<SuccessResp | ErrorResp>) {
+    // only GET allowed
     if (req.method !== "GET") {
         res.setHeader("Allow", "GET");
         return res.status(405).json({ success: false, error: "Method Not Allowed" });
     }
 
-    // Try load session (if any)
+    // optionally load session
     const session = await getServerSession(req, res, authOptions);
     
+    // validate cartID param
     const cartID = req.query.cartID;
     if (typeof cartID !== "string") {
         return res.status(400).json({ success: false, error: "Invalid Cart ID" });
     }
 
-    // Fetch cart + items + variant + product info
     try {
+        // fetch cart with nested items, variants, and products
         const cart = await prisma.virtualCart.findUnique({
             where: { cart_id: cartID },
             include: {
@@ -76,18 +78,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             },
         });
 
+        // cart not found
         if (!cart) {
             return res.status(404).json({ success: false, error: "Cart not found" });
         }
 
-        // If this cart is tied to a user, ensure only user can see it
+        // auth check for user-owned carts
         if (cart.user_id) {
             if (!session?.user?.id || session.user.id !== cart.user_id) {
                 return res.status(403).json({ success: false, error: "Forbidden" });
             }
         }
         
-        // Return cart and nested product / variant items
+        // shape and return response
         const resp: SuccessResp = {
             success: true,
             cart: {
@@ -114,6 +117,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         };
         return res.status(200).json(resp);
     } catch (err: any) {
+        // unexpected error
         return res.status(500).json({ success: false, error: "Failed to fetch cart" });
     }
 }

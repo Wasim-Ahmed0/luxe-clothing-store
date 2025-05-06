@@ -16,16 +16,18 @@ type ResponseData = { success: true; item: CartItemRow } | { success: false; err
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<ResponseData>) {
     const { cartID, itemID } = req.query;
+    // validate cartID and itemID
     if (typeof cartID !== "string" || typeof itemID !== "string") {
         return res.status(400).json({ success: false, error: "Invalid IDs" });
     }
 
+    // only allow PUT
     if (req.method !== "PUT") {
         res.setHeader("Allow", "PUT");
         return res.status(405).json({ success: false, error: "Method Not Allowed" });
     }
 
-    // Load the cartItem and its cart owner
+    // load cartItem and owner info
     const cartItem = await prisma.cartItem.findUnique({
         where: { cart_item_id: itemID },
         select: {
@@ -37,12 +39,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             cart: { select: { user_id: true } },
         },
     });
-    
     if (!cartItem) {
         return res.status(404).json({ success: false, error: "Item not found" });
     }
 
-    // Authentication - determine if guest or customer
+    // auth: if cart tied to user, verify owner
     const ownerId = cartItem.cart.user_id;
     if (ownerId) {
         const session = await getServerSession(req, res, authOptions);
@@ -50,17 +51,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
             return res.status(403).json({ success: false, error: "Forbidden" });
         }
     }
-    
-    // if ownerId is null -> guest cart -> anyone with the cartID may update!!!
+    // guest carts: any holder of cartID may update
 
-    // Extract payload
+    // extract and validate new quantity
     const { quantity } = req.body as { quantity?: number };
     if (!quantity || quantity < 1) {
         return res.status(400).json({ success: false, error: "Quantity must be ≥ 1" });
     }
 
-    // Perform update
     try {
+        // update cartItem record
         const updated = await prisma.cartItem.update({
             where: { cart_item_id: itemID },
             data: { quantity },
@@ -72,9 +72,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
                 price_at_time:true,
             },
         });
-        
         return res.status(200).json({ success: true, item: updated });
-    } catch (err: any) {
+    } catch {
+        // handle update error
         return res.status(500).json({ success: false, error: "Failed to update cart item" });
     }
 }

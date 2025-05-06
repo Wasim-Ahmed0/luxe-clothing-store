@@ -23,12 +23,14 @@ export default function OrderCheckout({ storeId }: Props) {
 
   const handleSearchOrder = async () => {
     if (!searchOrderId.trim()) return alert('Please enter an Order ID')
-
+    
+    // fetch order 
     const res = await fetch(`/api/orders/${searchOrderId}`)
     const data = await res.json()
     if (!res.ok || !data.order) {
       return alert('Order not found')
     }
+    // open modal
     setOrderDetails(data.order)
     setSelectedStatus(data.order.order_status)
     setModalOpen(true)
@@ -37,6 +39,7 @@ export default function OrderCheckout({ storeId }: Props) {
   const handleUpdateStatus = async () => {
     if (!orderDetails) return
     setUpdating(true)
+    // Update order status
     const res = await fetch(`/api/orders/${orderDetails.order_id}/status`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

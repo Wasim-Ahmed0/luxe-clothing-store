@@ -5,76 +5,75 @@ import { prisma } from "../../../../lib/prisma";
 import { OrderDetail, Order, Role } from "@/generated/prisma";
 
 type Item = {
-    variant_id: OrderDetail["variant_id"];
-    quantity: OrderDetail["quantity"];
-    price_at_purchase: OrderDetail["price_at_purchase"];
+  variant_id:        OrderDetail["variant_id"];
+  quantity:          OrderDetail["quantity"];
+  price_at_purchase: OrderDetail["price_at_purchase"];
 };
 
 type SuccessResp = {
-    success: true;
-    order: {
-        order_id: Order["order_id"];
-        store_id: Order["store_id"];
-        user_id: Order["user_id"];
-        status: Order["order_status"];
-        total_amount: Order["total_amount"];
-        created_at: Order["created_at"];
-        details: Item[];
-    };
+  success: true;
+  order: {
+    order_id:     Order["order_id"];
+    store_id:     Order["store_id"];
+    user_id:      Order["user_id"];
+    status:       Order["order_status"];
+    total_amount: Order["total_amount"];
+    created_at:   Order["created_at"];
+    details:      Item[];
+  };
 };
 
 type ErrorResp = { success: false; error: string };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<SuccessResp | ErrorResp>) {
-    if (req.method !== "GET") {
-        res.setHeader("Allow", "GET");
-        return res.status(405).json({ success: false, error: "Method Not Allowed" });
-    }
+  // only allow GET
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res.status(405).json({ success: false, error: "Method Not Allowed" });
+  }
 
-    // Auth
-    const session = await getServerSession(req, res, authOptions);
+  // attempt session load
+  const session = await getServerSession(req, res, authOptions);
 
-    // Validate Payload
-    const { orderID } = req.query;
-    if (typeof orderID !== "string") {
-        return res.status(400).json({ success: false, error: "Invalid order ID" });
-    }
+  // validate orderID param
+  const { orderID } = req.query;
+  if (typeof orderID !== "string") {
+    return res.status(400).json({ success: false, error: "Invalid order ID" });
+  }
 
-    // Fetch order
-    const order = await prisma.order.findUnique({
-        where: { order_id: orderID },
-        include: { details: true },
-    });
-    
-    if (!order) {
-        return res.status(404).json({ success: false, error: "Order not found" });
-    }
+  // fetch order + its details
+  const order = await prisma.order.findUnique({
+    where: { order_id: orderID },
+    include: { details: true },
+  });
+  if (!order) {
+    return res.status(404).json({ success: false, error: "Order not found" });
+  }
 
-    // Authorisation
-    const me = session?.user;
-    const isOwner = me?.id === order.user_id;
-    const isEmployee =
-        me?.role === Role.employee || me?.role === Role.store_manager;
-    
-    if (!isOwner && !isEmployee) {
-        return res.status(403).json({ success: false, error: "Forbidden" });
-    }
+  // authorization: owner or employee/store_manager
+  const me         = session?.user;
+  const isOwner    = me?.id === order.user_id;
+  const isEmployee =
+    me?.role === Role.employee || me?.role === Role.store_manager;
+  if (!isOwner && !isEmployee) {
+    return res.status(403).json({ success: false, error: "Forbidden" });
+  }
 
-  
-    return res.status(200).json({
-        success: true,
-        order: {
-            order_id: order.order_id,
-            store_id: order.store_id,
-            user_id: order.user_id,
-            status: order.order_status,
-            total_amount: order.total_amount,
-            created_at: order.created_at,
-            details: order.details.map((d) => ({
-                variant_id: d.variant_id,
-                quantity: d.quantity,
-                price_at_purchase: d.price_at_purchase,
-            })),
-        },
-    });
+  // build & return response
+  return res.status(200).json({
+    success: true,
+    order: {
+      order_id:     order.order_id,
+      store_id:     order.store_id,
+      user_id:      order.user_id,
+      status:       order.order_status,
+      total_amount: order.total_amount,
+      created_at:   order.created_at,
+      details:      order.details.map(d => ({
+        variant_id:        d.variant_id,
+        quantity:          d.quantity,
+        price_at_purchase: d.price_at_purchase,
+      })),
+    },
+  });
 }

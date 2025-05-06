@@ -53,8 +53,8 @@ export default function StaffDashboard({
               Log out
             </button>
           </div>
-
           <div className="flex space-x-4 mb-6">
+           {/* Inventory Tab */}
             {isManager && (
               <button
                 className={`px-4 py-2 rounded ${
@@ -65,6 +65,7 @@ export default function StaffDashboard({
                 Inventory
               </button>
             )}
+            {/* Fitting Requests Tab */}
             <button
               className={`px-4 py-2 rounded ${
                 tab === 'requests' ? 'bg-amber-800 text-white' : ' text-stone-400 bg-stone-200 cursor-pointer'
@@ -73,6 +74,7 @@ export default function StaffDashboard({
             >
               Fitting Requests
             </button>
+            {/* Fulfil Orders Tab */}
             <button
               className={`px-4 py-2 rounded ${
                 tab === 'checkout' ? 'bg-amber-800 text-white' : ' text-stone-400 bg-stone-200 cursor-pointer'
@@ -112,7 +114,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     select: { store_id: true },
   })
   if (!user?.store_id) return { notFound: true }
-
+  // Fetch inventory for specific store user is in
   const inventory = await prisma.inventory.findMany({
     where: { store_id: user.store_id },
     select: {
@@ -125,7 +127,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     },
   })
-
+  //fetch pending fitting room requests
   const requests = await prisma.fittingRoomRequest.findMany({
     where: { store_id: user.store_id, status: 'pending' },
     select: {
